@@ -90,22 +90,22 @@ int testGetRoi()
 	cv::Mat src = cv::imread("d:\\000533.jpg", 1);
 	cv::Rect rt = cv::Rect(100, src.rows-200, src.cols+100, 500);
 
-	TImage* ptsrc = Mat2TImage(src, EImageType::AI_I420);
+	TImage* ptsrc = Mat2TImage(src, EImageType::I420);
 
 	//cv::rectangle(src, rt, cv::Scalar(0,255,0), 2);
 	// getRoiFromTImage1();
 
 	TRect tRtRoi = Rect2TRect(rt);
 	TImage tRoiImg;
-	tRoiImg.atPlane->pvBuffer = malloc(tRtRoi.l32Width * tRtRoi.l32Height * 3 / 2);
+	tRoiImg.pu8Data = (u8*)malloc(tRtRoi.l32Width * tRtRoi.l32Height * 3 / 2);
 	getRoiFromTImage1(ptsrc, &tRoiImg, tRtRoi);
 
-	cv::Mat roi0 = cv::Mat(tRtRoi.l32Height, tRtRoi.l32Width, CV_8UC1, tRoiImg.atPlane->pvBuffer);
-	cv::Mat roi1 = cv::Mat(tRtRoi.l32Height/2, tRtRoi.l32Width/2, CV_8UC1, tRoiImg.atPlane[1].pvBuffer);
-	cv::Mat roi2 = cv::Mat(tRtRoi.l32Height/2, tRtRoi.l32Width/2, CV_8UC1, tRoiImg.atPlane[2].pvBuffer);
+	cv::Mat roi0 = cv::Mat(tRtRoi.l32Height, tRtRoi.l32Width, CV_8UC1, tRoiImg.pu8Data);
+	cv::Mat roi1 = cv::Mat(tRtRoi.l32Height / 2, tRtRoi.l32Width / 2, CV_8UC1, tRoiImg.pu8Data + tRtRoi.l32Width * tRtRoi.l32Height);
+	cv::Mat roi2 = cv::Mat(tRtRoi.l32Height / 2, tRtRoi.l32Width / 2, CV_8UC1, tRoiImg.pu8Data + tRtRoi.l32Width * tRtRoi.l32Height * 5 / 4);
 
 	cv::Mat roi = cv::Mat(tRtRoi.l32Height, tRtRoi.l32Width, CV_8UC3);
-	FvevehI420RGB24(&tRoiImg, roi.cols, roi.rows, roi.data, roi.step, 0);
+	FvevehI420BGR24(&tRoiImg, roi.cols, roi.rows, roi.data, roi.step, 0);
 	
 	cv::namedWindow("src", 1);
 	cv::imshow("src", roi0);

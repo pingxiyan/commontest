@@ -6,3 +6,6 @@
 /CommonTest2015.sln
 /copy2other.bat
 /copyhead.bat
+*.suo
+windows/
+ai_defs_kedacom.h

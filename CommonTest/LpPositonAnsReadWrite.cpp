@@ -5,7 +5,7 @@
 	2016-1-4															*/
 /************************************************************************/
 #include <opencv2/opencv.hpp>
-#include "ai_defs.h"
+#include "typedef.h"
 #include "CommonTest.h"
 
 std::vector<TPosAns> readPosAns(std::string strAnsFn)

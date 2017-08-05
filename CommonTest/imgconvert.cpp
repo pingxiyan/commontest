@@ -1,5 +1,5 @@
 #include "CommonTest.h"
-#include "ai_defs.h"
+#include "typedef.h"
 
 
 #define Clip(x) ((x) > 255 ? 255 : ((x) < 0 ? 0 : (x)))
@@ -123,7 +123,7 @@ void  ConvertRGB2I420(u8 *puYUV420, u8 *pu8RGB, l32 l32Width, l32 l32Height, l32
 
 #define Clip(x) ((x) > 255 ? 255 : ((x) < 0 ? 0 : (x)))
 
-void FveCvtNV12RGB24(const u8 *puYUVSP, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride)
+void FveCvtNV12BGR24(const u8 *puYUVSP, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride)
 {
 	l32 l32w,l32h;
 	u8* pu8Y, *pu8UV;
@@ -179,7 +179,7 @@ void FveCvtNV12RGB24(const u8 *puYUVSP, l32 l32Width, l32 l32Height, u8 *pu8RGB,
 	}
 }
 
-void FvevehI420RGB24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, BOOL bFlip)
+void FvevehI420BGR24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, BOOL bFlip)
 {
     l32 l32w,l32h;
     u8 *pu8Y, *pu8U, *pu8V;
@@ -194,12 +194,12 @@ void FvevehI420RGB24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l
     //l32Stride = l32Width * 3;
 
     // Y
-    pu8Y = (u8 *)tYuvImg->atPlane[0].pvBuffer;
-    pu8U = (u8 *)tYuvImg->atPlane[0].pvBuffer + nImgSize;
-    pu8V = (u8 *)tYuvImg->atPlane[0].pvBuffer + nImgSize * 5 / 4;
+    pu8Y = (u8 *)tYuvImg->pu8Data;
+	pu8U = (u8 *)tYuvImg->pu8Data + nImgSize;
+	pu8V = (u8 *)tYuvImg->pu8Data + nImgSize * 5 / 4;
     for(l32h = 0; l32h < l32Height; l32h++)
     {
-        pu8Y = (u8*)((u8 *)tYuvImg->atPlane[0].pvBuffer + l32h * l32Width);
+        pu8Y = (u8*)((u8 *)tYuvImg->pu8Data + l32h * l32Width);
         if(bFlip)
         {
             pu8RGBBuf = (u8*)(pu8RGB + (l32Height - l32h - 1) * l32DstStride);
@@ -234,7 +234,7 @@ void FvevehI420RGB24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l
 	waitKey();*/
 }
 
-void Yuv420ToRGB24(const char *pYuv, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, bool bFlip)
+void Yuv420ToBGR24(const char *pYuv, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, bool bFlip)
 {
     l32 l32w,l32h;
     u8 *pu8Y, *pu8U, *pu8V;
@@ -293,25 +293,16 @@ TImage* creatTImage(cv::Mat src, EImageType eImgType)
 	int nHeight = src.rows;
 	u8 * pu8YUV420 = new u8[src.step * src.rows];
 
-	ptImg->u32Type = eImgType; //AI_NV12; //AI_I420;
-	ptImg->atPlane[0].l32Width = nWidth;
-	ptImg->atPlane[0].l32Height = nHeight;
+	ptImg->u32Type = eImgType; //NV12; //I420;
+	ptImg->l32Width = nWidth;
+	ptImg->l32Height = nHeight;
 
-	if (AI_I420 == eImgType || AI_NV12 == eImgType)
+	if (I420 == eImgType || NV12 == eImgType)
 	{
-		ptImg->atPlane[0].l32Stride = nWidth;
-		ptImg->atPlane[1].l32Width = nWidth >> 1;
-		ptImg->atPlane[1].l32Height = nHeight >> 1;
-		ptImg->atPlane[1].l32Stride = nWidth >> 1;
-		ptImg->atPlane[2].l32Width = nWidth >> 1;
-		ptImg->atPlane[2].l32Height = nHeight >> 1;
-		ptImg->atPlane[2].l32Stride = nWidth >> 1;
+		ptImg->l32Stride = nWidth;
+		ptImg->pu8Data = pu8YUV420;
 
-		ptImg->atPlane[0].pvBuffer = pu8YUV420;
-		ptImg->atPlane[1].pvBuffer = pu8YUV420 + nWidth * nHeight;
-		ptImg->atPlane[2].pvBuffer = pu8YUV420 + nWidth * nHeight * 5 / 4;
-
-		if(AI_I420 == eImgType)
+		if(I420 == eImgType)
 		{
 			ConvertRGB2I420(pu8YUV420, src.data, nWidth, nHeight, src.step);
 		}
@@ -320,21 +311,21 @@ TImage* creatTImage(cv::Mat src, EImageType eImgType)
 			ConvertRGB2NV12(pu8YUV420, src.data, nWidth, nHeight, src.step);
 		}
 	}
-	else if(AI_RGB24 == eImgType)
+	else if(BGR24 == eImgType)
 	{
-		ptImg->atPlane[0].l32Stride = src.step;
-		ptImg->atPlane[0].pvBuffer = pu8YUV420;
+		ptImg->l32Stride = src.step;
+		ptImg->pu8Data = pu8YUV420;
 
 		memcpy(pu8YUV420, src.data, src.step * src.rows);
 	}
-	else if(AI_Y == eImgType)
+	else if(GRAY == eImgType)
 	{
 		if(src.channels() > 1)
 		{
 			cv::cvtColor(src,src, 6/*CV_BGR2GRAY*/);
 		}
-		ptImg->atPlane[0].l32Stride = src.step;
-		ptImg->atPlane[0].pvBuffer = pu8YUV420;
+		ptImg->l32Stride = src.step;
+		ptImg->pu8Data = pu8YUV420;
 		memcpy(pu8YUV420, src.data, src.step * src.rows);
 	}
 	else
@@ -345,11 +336,11 @@ TImage* creatTImage(cv::Mat src, EImageType eImgType)
 		return NULL;
 	}
 
-	//cv::Mat maty = cv::Mat(ptImg->atPlane->l32Height, ptImg->atPlane->l32Width, CV_8UC1, ptImg->atPlane->pvBuffer);
+	//cv::Mat maty = cv::Mat(ptImg->l32Height, ptImg->l32Width, CV_8UC1, ptImg->pu8Data);
 	//cv::imshow("y", maty);
-	//cv::Mat matu = cv::Mat(ptImg->atPlane[1].l32Height, ptImg->atPlane[1].l32Width, CV_8UC1, ptImg->atPlane[1].pvBuffer);
+	//cv::Mat matu = cv::Mat(ptImg->atPlane[1].l32Height, ptImg->atPlane[1].l32Width, CV_8UC1, ptImg->atPlane[1].pu8Data);
 	//cv::imshow("matu", matu);
-	//cv::Mat matv = cv::Mat(ptImg->atPlane[2].l32Height, ptImg->atPlane[2].l32Width, CV_8UC1, ptImg->atPlane[2].pvBuffer);
+	//cv::Mat matv = cv::Mat(ptImg->atPlane[2].l32Height, ptImg->atPlane[2].l32Width, CV_8UC1, ptImg->atPlane[2].pu8Data);
 	//cv::imshow("matv", matv);
 	//cv::waitKey();
 
@@ -361,9 +352,9 @@ void releaesTImage(TImage** pptImg)
 	TImage* ptImg = (TImage*)*pptImg;
 	if (ptImg)
 	{
-		if(ptImg->atPlane[0].pvBuffer) 
+		if(ptImg->pu8Data) 
 		{
-			delete[] ptImg->atPlane[0].pvBuffer;
+			delete[] ptImg->pu8Data;
 		}
 		delete ptImg;
 		*pptImg = NULL;
@@ -375,7 +366,7 @@ CTAPI cv::Mat Yuv2Mat(const char *pYuv420, int width, int height)
 {
 	cv::Mat src = cv::Mat(height, width, CV_8UC3);
 
-	Yuv420ToRGB24(pYuv420, width, height, src.data, src.step, false);
+	Yuv420ToBGR24(pYuv420, width, height, src.data, src.step, false);
 
 	return src;
 }

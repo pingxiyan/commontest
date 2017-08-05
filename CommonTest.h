@@ -41,7 +41,7 @@ CTAPI void writePosAns(std::string strAnsFn, std::vector<TPosAns> tPosAns);
 
 // 和TImage相关调试，显示等功能
 #if 1
-#include "ai_defs.h"
+#include "typedef.h"
 
 CTAPI void imshowTImage(const std::string& winname, TImage* ptImg, int flags=1);
 CTAPI void waitKeyTImage(int delay=0);
@@ -96,8 +96,8 @@ CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, st
 CTAPI void  ConvertRGB2NV12(u8 *puYUVSP, u8 *pu8RGB, l32 l32Width, l32 l32Height, l32 stride);
 CTAPI void  ConvertRGB2I420(u8 *puYUV420, u8 *pu8RGB, l32 l32Width, l32 l32Height, l32 l32Stride);
 
-CTAPI void FveCvtNV12RGB24(const u8 *puYUVSP, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride);
-CTAPI void FvevehI420RGB24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, BOOL bFlip);
+CTAPI void FveCvtNV12BGR24(const u8 *puYUVSP, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride);
+CTAPI void FvevehI420BGR24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, BOOL bFlip);
 
 // yuv 转换成 mat
 CTAPI cv::Mat Yuv2Mat(const char *pYuv420, int width, int height);

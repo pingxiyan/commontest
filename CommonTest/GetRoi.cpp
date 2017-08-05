@@ -7,7 +7,7 @@ Sandy Yann
 #include <string.h>
 #include "CommonTest.h"
 #include <opencv2/opencv.hpp>
-#include "ai_defs.h"
+#include "typedef.h"
 
 
 // 获得roi yxp版本
@@ -123,25 +123,25 @@ void getRoiFromTImage1(const TImage *ptSrc, TImage *ptRoi, TRect tRtRoi)
 	}
 
 	// 设置结果图像width，height，内存外层已经开辟
-	ptRoi->atPlane->l32Width = tRtRoi.l32Width;
-	ptRoi->atPlane->l32Height = tRtRoi.l32Height;
-	l32Channel = ptSrc->atPlane->l32Stride / ptSrc->atPlane->l32Width;
-	ptRoi->atPlane->l32Stride = tRtRoi.l32Width * l32Channel;
+	ptRoi->l32Width = tRtRoi.l32Width;
+	ptRoi->l32Height = tRtRoi.l32Height;
+	l32Channel = ptSrc->l32Stride / ptSrc->l32Width;
+	ptRoi->l32Stride = tRtRoi.l32Width * l32Channel;
 
-	pu8SrcBuf = (u8 *)ptSrc->atPlane->pvBuffer;
-	pu8DstBuf = (u8 *)ptRoi->atPlane->pvBuffer;
-	l32SrcStride = ptSrc->atPlane->l32Stride;
-	l32DstStride = ptRoi->atPlane->l32Stride;
+	pu8SrcBuf = (u8 *)ptSrc->pu8Data;
+	pu8DstBuf = (u8 *)ptRoi->pu8Data;
+	l32SrcStride = ptSrc->l32Stride;
+	l32DstStride = ptRoi->l32Stride;
 
 	// 设置边界值为110,全部赋值
-	memset(pu8DstBuf, 110, ptRoi->atPlane->l32Stride*ptRoi->atPlane->l32Height);
-	memset(pu8DstBuf + ptRoi->atPlane->l32Stride*ptRoi->atPlane->l32Height, 128, ptRoi->atPlane->l32Width*ptRoi->atPlane->l32Height/2);
+	memset(pu8DstBuf, 110, ptRoi->l32Stride*ptRoi->l32Height);
+	memset(pu8DstBuf + ptRoi->l32Stride*ptRoi->l32Height, 128, ptRoi->l32Width*ptRoi->l32Height/2);
 
 	// 在原始图像中的真实位置
 	x1 = MAX(0, tRtRoi.l32Left);
 	y1 = MAX(0, tRtRoi.l32Top);
-	x2 = MIN(ptSrc->atPlane->l32Width - 1, tRtRoi.l32Width + tRtRoi.l32Left - 1);
-	y2 = MIN(ptSrc->atPlane->l32Height - 1, tRtRoi.l32Height + tRtRoi.l32Top - 1);
+	x2 = MIN(ptSrc->l32Width - 1, tRtRoi.l32Width + tRtRoi.l32Left - 1);
+	y2 = MIN(ptSrc->l32Height - 1, tRtRoi.l32Height + tRtRoi.l32Top - 1);
 
 	int rw = x2 - x1 + 1;
 	int rh = y2 - y1 + 1;
@@ -160,11 +160,11 @@ void getRoiFromTImage1(const TImage *ptSrc, TImage *ptRoi, TRect tRtRoi)
 	}
 
 
-	if (ptSrc->u32Type == AI_NV12)
+	if (ptSrc->u32Type == NV12)
 	{
-		ptRoi->atPlane[1].pvBuffer = (u8*)ptRoi->atPlane->pvBuffer + tRtRoi.l32Width * tRtRoi.l32Height;
-		psrcbuf = pu8SrcBuf + ptSrc->atPlane->l32Stride * ptSrc->atPlane->l32Height + y1 / 2 * l32SrcStride + l32Channel*x1;
-		proibuf = (u8*)ptRoi->atPlane[1].pvBuffer + roiy1 /2 * l32DstStride + l32Channel*roix1;
+		u8* pu8UV = (u8*)ptRoi->pu8Data + tRtRoi.l32Width * tRtRoi.l32Height;
+		psrcbuf = pu8SrcBuf + ptSrc->l32Stride * ptSrc->l32Height + y1 / 2 * l32SrcStride + l32Channel*x1;
+		proibuf = (u8*)pu8UV + roiy1 / 2 * l32DstStride + l32Channel*roix1;
 		for (int h = 0; h < rh/2; h++)
 		{
 			memcpy(proibuf, psrcbuf, rw * l32Channel);
@@ -172,12 +172,12 @@ void getRoiFromTImage1(const TImage *ptSrc, TImage *ptRoi, TRect tRtRoi)
 			proibuf += l32DstStride;
 		}
 	}
-	else if(ptSrc->u32Type == AI_I420)
+	else if(ptSrc->u32Type == I420)
 	{
 		// u
-		ptRoi->atPlane[1].pvBuffer = (u8*)ptRoi->atPlane->pvBuffer + tRtRoi.l32Width * tRtRoi.l32Height;
-		psrcbuf = pu8SrcBuf + ptSrc->atPlane->l32Stride * ptSrc->atPlane->l32Height + (y1 * l32SrcStride / 2 + l32Channel*x1)/2;
-		proibuf = (u8*)ptRoi->atPlane[1].pvBuffer + (roiy1 * l32DstStride / 2 + l32Channel*roix1)/2;
+		u8* pu8U = (u8*)ptRoi->pu8Data + tRtRoi.l32Width * tRtRoi.l32Height;
+		psrcbuf = pu8SrcBuf + ptSrc->l32Stride * ptSrc->l32Height + (y1 * l32SrcStride / 2 + l32Channel*x1)/2;
+		proibuf = (u8*)pu8U + (roiy1 * l32DstStride / 2 + l32Channel*roix1) / 2;
 		for (int h = 0; h < rh/2; h++)
 		{
 			memcpy(proibuf, psrcbuf, rw * l32Channel / 2);
@@ -186,9 +186,9 @@ void getRoiFromTImage1(const TImage *ptSrc, TImage *ptRoi, TRect tRtRoi)
 		}
 
 		// v
-		ptRoi->atPlane[2].pvBuffer = (u8*)ptRoi->atPlane->pvBuffer + tRtRoi.l32Width * tRtRoi.l32Height * 5 / 4;
-		psrcbuf = pu8SrcBuf + ptSrc->atPlane->l32Stride * ptSrc->atPlane->l32Height * 5 / 4 + (y1 * l32SrcStride / 2 + l32Channel*x1)/2;
-		proibuf = (u8*)ptRoi->atPlane[2].pvBuffer + (roiy1 * l32DstStride / 2 + l32Channel*roix1)/2;
+		u8* pu8V = (u8*)ptRoi->pu8Data + tRtRoi.l32Width * tRtRoi.l32Height * 5 / 4;
+		psrcbuf = pu8SrcBuf + ptSrc->l32Stride * ptSrc->l32Height * 5 / 4 + (y1 * l32SrcStride / 2 + l32Channel*x1)/2;
+		proibuf = (u8*)pu8V + (roiy1 * l32DstStride / 2 + l32Channel*roix1) / 2;
 		for (int h = 0; h < rh/2; h++)
 		{
 			memcpy(proibuf, psrcbuf, rw * l32Channel / 2);
@@ -242,21 +242,21 @@ void getRoiTImageByLpPos(const TImage *ptSrc, TImage *ptRoi, const TRect tRtLp,
 	l32 roiStartPosX = rtLp2.l32Left - x1;
 	l32 roiStartPosY = rtLp2.l32Top - y1;
 
-	l32 l32Channel = ptSrc->atPlane->l32Stride / ptSrc->atPlane->l32Width;
+	l32 l32Channel = ptSrc->l32Stride / ptSrc->l32Width;
 
 	// 检查车牌位置，在roi图像中是否越界
 	l32 roiX1,roiX2,roiY1,roiY2;
 	roiX1 = MAX(0, roiStartPosX);
-	roiX2 = MIN(ptRoi->atPlane->l32Width - 1, roiStartPosX + rtLp2.l32Width - 1);
+	roiX2 = MIN(ptRoi->l32Width - 1, roiStartPosX + rtLp2.l32Width - 1);
 	roiY1 = MAX(0, roiStartPosY);
-	roiY2 = MIN(ptRoi->atPlane->l32Height - 1, roiStartPosY + rtLp2.l32Height - 1);
+	roiY2 = MIN(ptRoi->l32Height - 1, roiStartPosY + rtLp2.l32Height - 1);
 
-	u8* pu8LpBuf = (u8*)ptRoi->atPlane->pvBuffer + roiY1 * ptRoi->atPlane->l32Stride + roiX1 * l32Channel;
+	u8* pu8LpBuf = (u8*)ptRoi->pu8Data + roiY1 * ptRoi->l32Stride + roiX1 * l32Channel;
 	l32 l32CopySize = MAX(0, (roiX2 - roiX1)*l32Channel);
 	for (int h = 0; h < (roiY2 - roiY1); h++)
 	{
 		memset(pu8LpBuf, 110, l32CopySize);
-		pu8LpBuf += ptRoi->atPlane->l32Stride;
+		pu8LpBuf += ptRoi->l32Stride;
 	}
 }
 

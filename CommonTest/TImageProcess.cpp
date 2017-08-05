@@ -3,7 +3,7 @@
 	2016-1-29 Sandy Yann												*/
 /************************************************************************/
 #include "CommonTest.h"
-#include "ai_defs.h"
+#include "typedef.h"
 #include <opencv2/opencv.hpp>
 
 #include <string>
@@ -13,19 +13,19 @@ using std::string;
 void imshowTImage(const string& winname, TImage* ptImg, int flags)
 {
 	cv::Mat src;
-	if (ptImg->u32Type == AI_RGB24)
+	if (ptImg->u32Type == BGR24)
 	{
-		src = cv::Mat(ptImg->atPlane->l32Height, ptImg->atPlane->l32Width, CV_8UC3, ptImg->atPlane->pvBuffer);
+		src = cv::Mat(ptImg->l32Height, ptImg->l32Width, CV_8UC3, ptImg->pu8Data);
 	}
-	else if(ptImg->u32Type == AI_Y)
+	else if(ptImg->u32Type == GRAY)
 	{
-		src = cv::Mat(ptImg->atPlane->l32Height, ptImg->atPlane->l32Width, CV_8UC1, ptImg->atPlane->pvBuffer);
+		src = cv::Mat(ptImg->l32Height, ptImg->l32Width, CV_8UC1, ptImg->pu8Data);
 	}
-	else if(ptImg->u32Type == AI_I420)
+	else if(ptImg->u32Type == I420)
 	{
 
 	}
-	else if(ptImg->u32Type == AI_NV12)
+	else if(ptImg->u32Type == NV12)
 	{
 
 	}
