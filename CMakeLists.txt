@@ -12,13 +12,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include_directories(./)
 
 # ---[ 3rd OpenCV
-find_package(OpenCV REQUIRED)
+# find_package(OpenCV REQUIRED)
 
 # ---[ cpp/h file
 aux_source_directory(./ HEADERDIRS)
 aux_source_directory(./CommonTest/ DIRSRCS)
 
 # ---[ Add all files to Target project
-add_executable(va_task_detect_cls ${HEADERDIRS} ${DIRSRCS})
+add_executable(CommonTest ${HEADERDIRS} ${DIRSRCS})
 
-target_link_libraries(va_task_detect_cls ${OpenCV_LIBS})
+target_link_libraries(CommonTest ${OpenCV_LIBS})
