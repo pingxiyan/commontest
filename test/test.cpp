@@ -90,7 +90,7 @@ int testGetRoi()
 	cv::Mat src = cv::imread("d:\\000533.jpg", 1);
 	cv::Rect rt = cv::Rect(100, src.rows-200, src.cols+100, 500);
 
-	TImage* ptsrc = Mat2TImage(src, EImageType::I420);
+	TImage* ptsrc = Mat2TImage(src, I420);
 
 	//cv::rectangle(src, rt, cv::Scalar(0,255,0), 2);
 	// getRoiFromTImage1();
@@ -120,14 +120,8 @@ int testGetRoi()
 
 int main(int argc, char** argv)
 {
-	for(int i = 0;i<10000; i++)
-	{
-		char adir[64] = {0};
-		sprintf(adir, "xxx\\%05d", 20000+i);
-		MKDirTest(adir);
-	}
-	return 0;
-
+	return testGDB(argc, argv);
+	
 	//return testGetRoi();
 
 	//string sss = "G:\\search_ÕºœÒºÏÀ˜\\common_Õ®”√ƒø±ÍÀ—Àÿ\\Õ®”√ƒø±Í≤‚ ‘ºØ1\\lib.set";
@@ -138,14 +132,11 @@ int main(int argc, char** argv)
 
 	//testMultiThrdPart();
 
-	std::string strSetFn = "D:\\svn_database\\trunk\\DiamondDetect_¡‚–ŒÕ÷‘≤ºÏ≤‚v6.0\\Õº∆¨\\‘≤–ŒÕº∆¨\\dir.set.ans";
-	std::vector<std::string> vecFn;
-	std::vector<std::vector<TRect>> vvPosRt;
-	parsePosAns(strSetFn, vecFn, vvPosRt);
+	// std::string strSetFn = "D:\\svn_database\\trunk\\DiamondDetect_¡‚–ŒÕ÷‘≤ºÏ≤‚v6.0\\Õº∆¨\\‘≤–ŒÕº∆¨\\dir.set.ans";
+	// std::vector<std::string> vecFn;
+	// std::vector<std::vector<TRect> > vvPosRt;
+	// parsePosAns(strSetFn, vecFn, vvPosRt);
 
-
-
-	/* ≤‚ ‘–¥»’÷æ */
 	//testWriteLog();
 
 	return 0;

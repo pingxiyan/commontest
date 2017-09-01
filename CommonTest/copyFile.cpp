@@ -1,15 +1,22 @@
 /************************************************************************
-/* 文件的copy相关操作
-	Sandy Yann
-	2016-1-4															*/
+* Sample file process, related with 'copy'
+*	Sandy Yann
+*	2016-1-4															
 /************************************************************************/
 #include "CommonTest.h"
 
-
+#ifdef _WIN32
 #include <Windows.h>
-// 根据文件名，如果路径不存在，则创建路径
+#endif
+
+/**
+*brief@ Create path based file name, eg. /home/xx/xx.bmp
+*param@ strFn : File name string
+*return@ TRUE or FALSE
+*/
 BOOL createPath(std::string strFn)
 {
+#ifdef _WIN32
 	std::string strCurPath = strFn.substr(0, strFn.find('\\'));
 
 	WIN32_FIND_DATAA fd;
@@ -24,20 +31,22 @@ BOOL createPath(std::string strFn)
 	{
 		return FALSE;
 	}
+#else	/* LINXU */
 
+#endif
 	return TRUE;
 }
 
-/*=======================================================================
-Function : 文件copy，源文件名到目的文件名,实测发现这样读写要比调用dos命令要快
-Param    : 
-Return   : void
-=========================================================================*/
+/**
+*brief@ Fast copy one file to destination file 
+*param@ strSrcFn : Copyed file
+*param@ strDstFn : Destination file
+*/
 void copyFile2DstFn(std::string strSrcFn, std::string strDstFn)
 {
 	FILE* pfSrc = fopen(strSrcFn.c_str(), "rb");
 
-	// 检查文件夹是否存在，如果不存在，则创建
+	// 
 	createPath(strDstFn);
 	FILE* pfDst = fopen(strDstFn.c_str(), "wb");
 

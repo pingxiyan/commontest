@@ -90,8 +90,8 @@ CTAPI bool parseVehLogoFileName(std::string strfn,
 						  l32& l32LpHorizontalTheta);
 // 解析位置答案文件
 // 答案格式为：filename|x,y,w,h|x,y,w,h
-CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<TRect>>& vvPosRt);
-CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<cv::Rect>>& vvPosRt);
+CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<TRect> >& vvPosRt);
+CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<cv::Rect> >& vvPosRt);
 
 CTAPI void  ConvertRGB2NV12(u8 *puYUVSP, u8 *pu8RGB, l32 l32Width, l32 l32Height, l32 stride);
 CTAPI void  ConvertRGB2I420(u8 *puYUV420, u8 *pu8RGB, l32 l32Width, l32 l32Height, l32 l32Stride);
@@ -153,18 +153,25 @@ CTAPI int RMDirTest(const char *filepath);	// 清空文件夹
 CTAPI void DelFile(const char* fn);
 
 
-// 多线程测试
-typedef void* (__stdcall*MultiOpen)(int idx/*线程序号*/);
+// Fast multi-thread test interface
+#ifdef _WIN32
+typedef void* (__stdcall*MultiOpen)(int idx/*thread id, */);
 typedef int (__stdcall*MultiProcess)(void* pvHandle, const char* fn, void *pvUser);
 typedef int(__stdcall*MultiClose)(void*pvHandle);
-CTAPI void multiThrdTest(std::string strSetFn,	// set文件名
-						 int thrnum,	// 线程数目>=1
+#else
+typedef void* (*MultiOpen)(int idx/*thread id, */);
+typedef int (*MultiProcess)(void* pvHandle, const char* fn, void *pvUser);
+typedef int(*MultiClose)(void*pvHandle);
+#endif
+CTAPI void multiThrdTest(std::string strSetFn,	// multi-thread test function
+						 int thrnum,	// Start thread count >=1
 						 MultiOpen myOpen,
 						 MultiProcess myProcess,
 						 MultiClose myClose,
 						 void *pvUser);
-CTAPI void multiThrdTest(std::vector<std::string> vecFn,	// set文件名
-	int thrnum,	// 线程数目>=1
+
+CTAPI void multiThrdTest(std::vector<std::string> vecFn,	// Directly process every file based on multi-thread.
+	int thrnum,	// Start thread count >=1
 	MultiOpen myOpen,
 	MultiProcess myProcess,
 	MultiClose myClose,
@@ -247,7 +254,7 @@ inline BOOL readString2Buf(FILE* pfIn, char* pBuf, int bufSZ)
 	return TRUE;
 }
 
-// 数组读写
+// Read array based byte
 CTAPI void writeArray(FILE* pfOut, char* pf32Arr, int lenlen);
 inline char* readArray(FILE* pfIn, int& len){
 	readText(pfIn, len);
@@ -260,22 +267,20 @@ inline char* readArray(FILE* pfIn, int& len){
 	return ptext;
 }
 
-// true：文件结尾，
+// true: file exist
 CTAPI bool fileEof(FILE* pfIn);
 #endif
 
-// 解析配置文件部分
+// Parse config file part
 #if 1
-// 打开配置文件，获取配置文件句柄
 CTAPI void* readConfig(const char* ps8ConfigFn);
 CTAPI void releaseConfig(void**ppvHandle);
 
-// 根据配置文件句柄，获取某一类的值
 CTAPI bool parseConfig(void* pvHandle, char* ps8Label, int &val);
 CTAPI bool parseConfig(void* pvHandle, char* ps8Label, float &val);
 CTAPI bool parseConfig(void* pvHandle, char* ps8Label, std::string & strOut);
 CTAPI bool parseConfig(void* pvHandle, char* ps8Label, bool &val);
-/* 测试用例
+/* sample
 class CConfigParam
 {
 public:
@@ -305,15 +310,13 @@ private:
 
 CTAPI std::string getExePath();
 
-// 获得当前时间，精确到秒; 格式为：year-month-day h:m:s
+// Return string, format = year-month-day h:m:s
 CTAPI std::string getCurStrTime();
-#if 1	// 日志管理
-/* 初始化日志的名字，如果不初始化，使用默认名字log_时间.txt,
-	会把一个月以前的日志文件删除；
-	程序启动时，会初始化日志的文件名字	；	*/
+#if 1	// log part
+/* Initial log file */
 CTAPI void InitialLog(const char* pLogFn);
 
-// 所有的日志信息都会输出到log_time.log中
+// Printf log to file txt
 CTAPI void printfLog(const char* pLogText);
 #define PrintfLogArg(_format, ...) {\
 	char atext[1024] = { 0 };		\
@@ -323,5 +326,9 @@ CTAPI void printfLog(const char* pLogText);
 }
 #endif
 
+/**
+*brief@ Learn to how to use GDB tool
+*/
+int testGDB(int argc, char** argv);
 
 #endif

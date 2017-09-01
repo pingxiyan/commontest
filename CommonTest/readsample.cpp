@@ -217,7 +217,16 @@ std::vector<std::string> sampleChooseOneDir(std::vector<std::string> vecFn, int 
 	return vecRes;
 }
 
+/* MKDirTest sample
+for(int i = 0;i<2; i++)
+{
+	char adir[64] = {0};
+	sprintf(adir, "xxx/%05d", 20000+i);
+	MKDirTest(adir);
+}
+*/
 
+#ifdef _WIN32
 #include <stdio.h>  // for snprintf
 #include <string>
 #include <vector>
@@ -233,11 +242,7 @@ int MKDirTest(const char *filepath)
 	strcpy(buffer, filepath);
 	string ss;
 
-#if defined (ARCH_X64_LINUX) || defined (ARCH_X86_LINUX)
-	label = strtok(buffer, "/");
-#else
 	label = strtok(buffer, "\\");
-#endif
 
 	while (label)
 	{
@@ -254,26 +259,55 @@ int MKDirTest(const char *filepath)
 			break;
 		}
 
-		//创建子文件夹
 		if (_access(ss.c_str(), 0)<0)
 		{
-#if defined (ARCH_X64_LINUX) || defined (ARCH_X86_LINUX)
-			mkdir(ss.c_str(), 777);
-#else
 			_mkdir(ss.c_str());
-#endif
 		}
-#if defined (ARCH_X64_LINUX) || defined (ARCH_X86_LINUX)
-		ss.append("/");
-		label = strtok(NULL, "/");
-#else
+
 		ss.append("\\");
 		label = strtok(NULL, "\\");
-#endif
 	}
 
 	return 0;
 }
+#else	/* LINUX */
+#include <unistd.h>
+#include <sys/stat.h>
+int MKDirTest(const char *filepath)
+{
+	char buffer[256];
+	char *label;
+	strcpy(buffer, filepath);
+	string ss;
+
+	label = strtok(buffer, "/");
+
+	while (label)
+	{
+		ss += label;
+		int xxx = ss.find(".ans");
+		int xxx2 = ss.find(".jpg");
+
+		if((int)ss.find(".jpg")>0  || (int)ss.find("JPG")>0 ||
+			(int)ss.find(".fea")>0 || 
+			(int)ss.find(".ans")>0 || 
+			(int)ss.find(".txt")>0 ||
+			(int)ss.find(".bmp")>0 || (int)ss.find(".BMP")>0)
+		{
+			break;
+		}
+
+		if (access(ss.c_str(), 0)<0) {
+			mkdir(ss.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+		}
+
+		ss.append("/");
+		label = strtok(NULL, "/");
+	}
+
+	return 0;
+}
+#endif
 
 CTAPI int RMDirTest(const char *filepath)
 {
@@ -347,7 +381,7 @@ static std::vector<TRect> getAllAnsPos(std::string strTemp)
 
 // 解析位置答案文件
 // 答案格式为：filename|x,y,w,h|x,y,w,h
-CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<TRect>>& vvPosRt)
+CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<TRect> >& vvPosRt)
 {
 	std::vector<std::string> vecRows = readsample(strSetFn);
 
@@ -377,9 +411,9 @@ CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, st
 	}
 }
 
-CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<cv::Rect>>& vvPosRt)
+CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<cv::Rect> >& vvPosRt)
 {
-	std::vector<std::vector<TRect>> vvPosMyRt;
+	std::vector<std::vector<TRect> > vvPosMyRt;
 	parsePosAns(strSetFn, vecFn, vvPosMyRt);
 
 	for (size_t i = 0; i < vvPosMyRt.size(); i++)

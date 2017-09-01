@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(CommonTest)
+set (TARGET_OBJ commontest)
+
+project(${TARGET_OBJ})
 
 
 ######################################
@@ -18,7 +20,7 @@ set(COMMON_TEST_VERSION "1.0.0.1")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # ---[ Set Inlcude header file path
-include_directories(./)
+include_directories(./ ../)
 
 # ---[ 3rd OpenCV ===================
 if(WIN32)
@@ -37,7 +39,13 @@ aux_source_directory(./CommonTest/ DIRSRCS)
 aux_source_directory(./test/ DIRSRCS)
 
 # ---[ Add all files to Target project
-add_executable(CommonTest ${HEADERDIRS} ${DIRSRCS})
+add_executable(${TARGET_OBJ} ${HEADERDIRS} ${DIRSRCS})
 
-target_link_libraries(CommonTest debug ${OpenCV_LIBS_D})
-target_link_libraries(CommonTest optimized ${OpenCV_LIBS_R})
+if(WIN32)
+target_link_libraries(${TARGET_OBJ} debug ${OpenCV_LIBS_D})
+target_link_libraries(${TARGET_OBJ} optimized ${OpenCV_LIBS_R})
+endif(WIN32)
+
+if(UNIX)
+target_link_libraries(${TARGET_OBJ} ${OpenCV_LIBS} pthread.a)
+endif(UNIX)

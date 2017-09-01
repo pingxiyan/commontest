@@ -1,14 +1,16 @@
 /************************************************************************
 /* 2016-5-30 Sandy Yann 通过回调函数实现多线程测试，			      	*/
 /************************************************************************/
-
+#ifdef _WIN32
 #include <Windows.h>
-#include "commontest.h"
+#endif
+
+#include "CommonTest.h"
 
 typedef struct tagThrdParam
 {
 	std::vector<std::string> vecSet;
-	int id;				// 当前线程,for循环用的序号
+	int id;				// my thread id
 
 	MultiOpen myOpen;
 	MultiProcess myProcess;
@@ -16,9 +18,13 @@ typedef struct tagThrdParam
 	void *pvUser;
 }TThrdParam;
 
+#ifdef _WIN32
 DWORD WINAPI MyThrdProcFun( LPVOID lpParam ) 
+#else
+uint32_t MyThrdProcFun( void* lpParam ) 
+#endif /*_WIN32*/
 {
-	TThrdParam  *pThrdParam = (TThrdParam*)lpParam;
+	TThrdParam *pThrdParam = (TThrdParam*)lpParam;
 
 	void* pvCBHandle = NULL;
 	if(pThrdParam->myOpen != NULL)
@@ -51,7 +57,6 @@ CTAPI void multiThrdTest(std::vector<std::string> vecFn,	// set文件名
 						 MultiClose myClose,
 						 void *pvUser)
 {	
-	// 开辟线程
 	std::cout << "\n=====================================\n";
 	std::cout << "file count = " << vecFn.size() << "\n" ;
 	std::cout << "multi-thread num = " << thrnum << std::endl;
@@ -59,6 +64,7 @@ CTAPI void multiThrdTest(std::vector<std::string> vecFn,	// set文件名
 	int thrdnum = thrnum;
 	int onepart = vecFn.size() / thrdnum;
 
+#ifdef _WIN32
 	DWORD   *dwThreadIdArray = new DWORD[thrdnum];
 	HANDLE  *hThreadArray = new HANDLE[thrdnum]; 
 	TThrdParam  *pvecThrdPram = new TThrdParam[thrdnum]; 
@@ -74,29 +80,31 @@ CTAPI void multiThrdTest(std::vector<std::string> vecFn,	// set文件名
 		pvecThrdPram[i].myProcess = myProcess;
 		pvecThrdPram[i].myClose = myClose;
 
-		// 创建线程
 		hThreadArray[i] = CreateThread( 
 			NULL,                   // default security attributes
 			0,                      // use default stack size  
-			MyThrdProcFun,       // thread function name
-			&(pvecThrdPram[i]),          // argument to thread function 
+			MyThrdProcFun,			// thread function name
+			&(pvecThrdPram[i]),		// argument to thread function 
 			0,                      // use default creation flags 
 			&dwThreadIdArray[i]);
 	}
 
 	WaitForMultipleObjects(thrdnum, hThreadArray, TRUE, INFINITE);
 
-	// 释放资源
+	// release buffer
 	delete[] dwThreadIdArray;
 	delete[] hThreadArray;
 	delete[] pvecThrdPram;
+#else
+
+#endif
 
 	std::cout << "finish\n";
 }
 
-// 多线程测试
-CTAPI void multiThrdTest(std::string strSetFn,	// set文件名
-						 int thrnum,	// 线程数目>=1
+
+CTAPI void multiThrdTest(std::string strSetFn,	// set file name
+						 int thrnum,			// my thread id
 						 MultiOpen myOpen,
 						 MultiProcess myProcess,
 						 MultiClose myClose,

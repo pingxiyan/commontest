@@ -1,41 +1,44 @@
-/**/
-
 /**************************************************************
-	和日志相关的代码
+	Log part, but I recommond use common open source log lib
 	Sandy Yann 
 	2016-04-02
 **************************************************************/
 
-/************************************************************************
-/* 日志管理：为了每次日志不被覆盖，所以名字中加入时间，这样就必须删除一段时间
-	之前的日志文件 	
-
-	2017-2-14 修改为：程序启动初始化一次日志的名字，没有日志产生时，没有日志文
-				件产生，日志文件名字可以初始化（没有初始化，采用默认名字），
-				名字中依然有时间信息*/
-/************************************************************************/
 #include "CommonTest.h"
 #include "opencv2/opencv.hpp"
 
+#ifdef _WIN32
 #include <Windows.h>
 #include <time.h>
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <io.h>
+#else
+#include <sys/stat.h>
+#endif
 
-#include<io.h>
 
-#define SHOW_LOG_CONSOLE 1	// 是否显示日志到命令行
-#define LOG_NAME	"alg"	// 初始化日志的名字（如果没有调用InitialLog）	
+#define SHOW_LOG_CONSOLE 1	// 
+#define LOG_NAME	"alg"	// 
 
+#ifdef _WIN32
 CTAPI std::string getExePath()
 {
 	char szFilePath[MAX_PATH + 1] = { 0 };
 	GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
-	(strrchr(szFilePath, '\\'))[0] = 0; // 删除文件名，只获得路径字串  
+	(strrchr(szFilePath, '\\'))[0] = 0; //   
 	std::string path = szFilePath;
 	return path;
 }
+#else
+CTAPI std::string getExePath()
+{
+	char exec_name [1024] = {0};
+	readlink ("/proc/self/exe", exec_name, 1024);
+	return std::string(exec_name);
+}
+#endif
 
 static void judgeTimeAndDel(std::string strFullFn)
 {
@@ -56,7 +59,6 @@ static void judgeTimeAndDel(std::string strFullFn)
 
 	std::cout << strFullFn << std::endl;
 
-	// 如果log格式有误
 	if (oldY == 0 || oldM == 0 || oldD == 0)
 	{
 		return;
@@ -68,9 +70,10 @@ static void judgeTimeAndDel(std::string strFullFn)
 	}
 }
 
-// 删除一个月以前的日志文件,避免太多
+// Delete log.txt more one month ago
 static void delOneMonthAgoLog()
 {
+#ifdef _WIN32
 	std::string strRootPath = getExePath();
 	std::string strLogFullName = strRootPath + "\\" + "*.log";
 
@@ -94,11 +97,13 @@ static void delOneMonthAgoLog()
 
 		_findclose(Handle);
 	}
+#else
+
+#endif
 }
 
 static std::string getLogFileName(std::string strLogFn)
 {
-	// 删除一个月以前的日志文件
 	delOneMonthAgoLog();
 
 	time_t t = time(0);
@@ -110,7 +115,6 @@ static std::string getLogFileName(std::string strLogFn)
 }
 static std::string g_LogFileName = getLogFileName(std::string());
 
-// 获得当前时间，精确到秒; 格式为：year-month-day h:m:s
 CTAPI std::string getCurStrTime()
 {
 	time_t t = time(0);
@@ -120,7 +124,6 @@ CTAPI std::string getCurStrTime()
 	return std::string(tmp);
 }
 
-// 所有的日志信息都会输出到log.txt
 CTAPI void printfLog(const char* pLogText)
 {
 	std::string strLogFullName = getExePath() + "\\" + g_LogFileName;
@@ -146,11 +149,35 @@ CTAPI void printfLog(const char* pLogText)
 	printf("%s : %s\n", tmp, pLogText);
 }
 
-/* 初始化日志的名字，如果不初始化，使用默认名字log_时间.txt,
-会把一个月以前的日志文件删除	*/
+
 CTAPI void InitialLog(const char* pLogFn)
 {
-	// 初始化日志名字,默认为"alg_time.log"
 	g_LogFileName = getLogFileName(pLogFn);
-
 }
+
+
+/*===========================================*/
+void subFun(int arr[])
+{
+	arr[999999999] = 123;
+}
+/**
+*brief@ Learn to how to use GDB tool
+*/
+int testGDB(int argc, char** argv)
+{
+	std::cout << "Enter " << __FUNCTION__ << std::endl;
+
+	int arr[20] = {0};
+
+	arr[20] = 9;
+
+	std::cout << "err index value = " << arr[20] << std::endl;
+
+	subFun(arr);
+
+	std::cout << "err index value = " << arr[99999] << std::endl;
+
+	return 1;
+}
+/*===========================================*/

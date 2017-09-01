@@ -1,21 +1,13 @@
-/******************************************************************************
-模块名      ： test
-相关文件    ： testpublic.h
-文件实现功能： test中读配置文件
-			   配置文件中，每一行配置的存放格式为：
-			   LABEL = VAL # NOTE
-			   所有的配置按行存储，
--------------------------------------------------------------------------------
-修改记录:
-日  期        版本        修改人        走读人    修改内容
-2015-12-30    1.0         闫西平                    创建
-******************************************************************************/
-
+/***********************************************
+* Read config file, myself format
+* Aug. 30 2017 Sandy Yann
+***********************************************/
 #include "CommonTest.h"
 
 #include <string>
 #include <vector>
 #include <iostream>
+#include <stdio.h>
 
 using std::string;
 using std::vector;
@@ -34,7 +26,7 @@ typedef struct
 	string strVal;
 }TCfgItem;
 
-// 在文件中读一行
+
 static char* readOneRowInFile(FILE* pF, int &len, bool &bEOF);
 static bool parseOneRow(char* pbuf, int len, TCfgItem &tCfgItem);
 
@@ -206,13 +198,19 @@ bool parseConfig(void* pvHandle, char* ps8Label, string & strOut)
 	return false;
 }
 
-// 在文件中读一行
+/**
+*brief@ read one line from FILE handle
+*/
 static char* readOneRowInFile(FILE* pF, int &len, bool &bEOF)
 {
 	char curChar;
 	char* pStr = NULL;
 	int num = 0;
+	#ifdef _WIN32
 	fpos_t fpt1 = 0;
+	#else
+	fpos_t fpt1 = {0};
+	#endif
 
 	bEOF = false;
 	// 获取当前位置
@@ -241,10 +239,12 @@ static char* readOneRowInFile(FILE* pF, int &len, bool &bEOF)
 		num++;
 	}
 
-	// 还原到开始位置
+	#ifdef _WIN32
 	fseek(pF, (long)fpt1, SEEK_SET);
+	#else
+	fsetpos(pF, &fpt1);
+	#endif // _WIN32
 
-	// 读取一行字符串
 	pStr = (char*)malloc(num + 1);
 	fread(pStr, sizeof(char), num + 1, pF);
 	len = num + 1;
