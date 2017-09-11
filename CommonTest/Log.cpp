@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <io.h>
+#include <iostream>
 #else
 #include <sys/stat.h>
 #endif

@@ -1,17 +1,9 @@
-cmake_minimum_required(VERSION 2.8)
+﻿cmake_minimum_required(VERSION 2.8)
 
 set (TARGET_OBJ commontest)
 
 project(${TARGET_OBJ})
 
-
-######################################
-if(WIN32)
-set(OpenCV_Include "../../../svn_database/trunk/3rdParty/opencv30/header")
-set(OpenCV_LibPath "../../../svn_database/trunk/3rdParty/opencv30/lib/x64/vc12/lib")
-set(OpenCV_LIBS_D "opencv_world300d.lib")
-set(OpenCV_LIBS_R "opencv_world300.lib")
-endif(WIN32)
 
 # ---[ Version
 set(COMMON_TEST_VERSION "1.0.0.1")
@@ -20,31 +12,25 @@ set(COMMON_TEST_VERSION "1.0.0.1")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # ---[ Set Inlcude header file path
-include_directories(./ ../)
+include_directories(./include)
 
-# ---[ 3rd OpenCV ===================
-if(WIN32)
-include_directories(${OpenCV_Include})
-LINK_DIRECTORIES(${OpenCV_LibPath})
-endif(WIN32)
+find_package(OpenCV REQUIRED )
 
-if(UNIX)
-find_package(OpenCV REQUIRED)
-endif(UNIX)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
+message(STATUS "================= ${OpenCV_LIBS}")
+message(STATUS "xxxxxxxx ${OpenCV_INCLUDE_DIRS}")
 
 # ---[ cpp/h file
-aux_source_directory(./ HEADERDIRS)
+aux_source_directory(./include HEADERDIRS)
 aux_source_directory(./CommonTest/ DIRSRCS)
 aux_source_directory(./test/ DIRSRCS)
 
 # ---[ Add all files to Target project
 add_executable(${TARGET_OBJ} ${HEADERDIRS} ${DIRSRCS})
 
-if(WIN32)
-target_link_libraries(${TARGET_OBJ} debug ${OpenCV_LIBS_D})
-target_link_libraries(${TARGET_OBJ} optimized ${OpenCV_LIBS_R})
-endif(WIN32)
+
+target_link_libraries(${TARGET_OBJ} ${OpenCV_LIBS})
 
 if(UNIX)
 target_link_libraries(${TARGET_OBJ} ${OpenCV_LIBS} pthread.a)
