@@ -5,7 +5,6 @@
 **************************************************************/
 
 #include "CommonTest.h"
-#include "opencv2/opencv.hpp"
 
 #ifdef _WIN32
 #include <Windows.h>
