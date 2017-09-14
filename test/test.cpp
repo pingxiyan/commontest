@@ -120,6 +120,13 @@ int testGetRoi()
 
 int main(int argc, char** argv)
 {
+	InitialLog("mylog");
+
+	PERR("my error \n");
+	PWARNING("my WARNING \n");
+	POUT("pout test %d \n", 20);
+
+	return 0;
 	return testGDB(argc, argv);
 	
 	//return testGetRoi();

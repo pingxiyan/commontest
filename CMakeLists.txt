@@ -26,6 +26,10 @@ aux_source_directory(./include HEADERDIRS)
 aux_source_directory(./CommonTest/ DIRSRCS)
 aux_source_directory(./test/ DIRSRCS)
 
+# ---[ h file folder
+file(GLOB_RECURSE HEADERDIRS  *.h *.hpp)
+source_group("Include" FILES ${HEADERDIRS}) 
+
 # ---[ Add all files to Target project
 add_executable(${TARGET_OBJ} ${HEADERDIRS} ${DIRSRCS})
 

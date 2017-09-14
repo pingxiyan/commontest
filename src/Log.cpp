@@ -5,6 +5,7 @@
 **************************************************************/
 
 #include "CommonTest.h"
+#include "cclog.h"
 
 #ifdef _WIN32
 #include <Windows.h>
