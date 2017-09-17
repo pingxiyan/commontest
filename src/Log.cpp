@@ -17,6 +17,7 @@
 #include <iostream>
 #else
 #include <sys/stat.h>
+#include <dirent.h>
 #endif
 
 
@@ -124,54 +125,32 @@ static void delOneMonthAgoLog(bool bOneMonth)
 	DIR *dp;
 	struct dirent *dirp;
 
-	//打开指定目录  
-	if ((dp = opendir(strRootPath.c_str()) == NULL)
+	// opendir, readdir, closedir
+	dp = opendir(strRootPath.c_str());  
+	if (dp == NULL)
 	{
 		perror("opendir");
 	}
 
-	//开始遍历目录  
+	// loop all files.  
 	while ((dirp = readdir(dp)) != NULL)
-	{
-		//跳过'.'和'..'两个目录  
+	{  
 		if (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
 			continue;
 
 		int size = strlen(dirp->d_name);
 
-		//如果是.wav文件，长度至少是5  
+		// file length < 5, can't is *.log file.  
 		if (size<5)
 			continue;
 
-		//只存取.mp3扩展名的文件名  
-		if (strcmp((dirp->d_name + (size - 4)), ".mp3") != 0)
+		// find all *.log file
+		if (strcmp((dirp->d_name + (size - 4)), ".log") != 0)
 			continue;
 
-		/*把文件名d_name 每SINGLENUM个写入一个文件，
-		**用一个变量count记录遍历到的文件的数量，
-		**每SINGLENUM个打开一个新文件
-		*/
-
-		if ((++count) > SINGLENUM)
-		{
-			fclose(fp);
-			times++;
-			sprintf(txtname, "%02d.txt", times);           //自动命名生成.txt文件                                        
-			if ((fp = fopen(txtname, "w+")) == NULL)
-			{
-				perror("fopen");
-				exit(EXIT_FAILURE);
-			}
-
-			count = 1;
-		}
-
-		fputs(dirp->d_name, fp);
-		fputs(" ", fp);                                  // 在一个filename结束之后，写入空格，方便脚本读取，进程转换操作  
-
+		std::cout << dirp->d_name << std::endl;
 	}
 
-	fclose(fp);
 	closedir(dp);
 #endif
 }
