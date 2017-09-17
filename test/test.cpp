@@ -120,7 +120,7 @@ int testGetRoi()
 
 int main(int argc, char** argv)
 {
-	InitialLog("mylog");
+	InitialLog("mylog", true, true);
 
 	PERR("my error \n");
 	PWARNING("my WARNING \n");

@@ -1,9 +1,14 @@
 /************************************************************************
-/* 车牌位置答案读写，
-	对应的显示工具位置：E:\svnroot\ai_cbb\trunk\ai_cbb_dev\A0611_fvextract\algorithm\车辆标定工具\tool_label_vehicle\Release
-	Sandy Yann
-	2016-1-4															*/
-/************************************************************************/
+* LP answer read and write, the calibrate format as follow:
+* First line: rootpath
+* Other line: file full name|%d,%d,%d,%d|x,y,w,h
+* Sandy Yann 2016-1-4 : 
+* Iniatlly, this tool was writen for KEDACOM testing. 
+* Old calibration tool was palced at:
+* E:\svnroot\ai_cbb\trunk\ai_cbb_dev\A0611_fvextract\algorithm\车辆标定工具\tool_label_vehicle\Release
+* Sandy Yann September 17 2017: 
+* And Later, it can be used as a public tool, public data format.
+***********************************************************************/
 #include <opencv2/opencv.hpp>
 #include "typedef.h"
 #include "CommonTest.h"

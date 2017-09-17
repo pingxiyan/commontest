@@ -21,7 +21,9 @@
 
 
 #define SHOW_LOG_CONSOLE 1	// 
-#define LOG_NAME	"alg"	// 
+#define LOG_NAME	"mylog"	// 
+
+static std::string g_LogFileName = LOG_NAME; //getLogFileName(std::string());
 
 #ifdef _WIN32
 CTAPI std::string getExePath()
@@ -68,53 +70,124 @@ static void judgeTimeAndDel(std::string strFullFn)
 	if (curY * 12 * 30 + curM * 30 + curD - oldY * 12 * 30 - oldM * 30 - oldD >= 28)
 	{
 		DelFile(strFullFn.c_str());
+		std::cout << " had deleted! "<< std::endl;
 	}
 }
 
-// Delete log.txt more one month ago
-static void delOneMonthAgoLog()
+/**
+* brief@ Delete log.txt before more one month, or all '*.log' files
+* param@ bOneMonth: 
+*	true: delete *.log created before one month.
+*	false: delete all *.log 
+*/
+static void delOneMonthAgoLog(bool bOneMonth)
 {
-#ifdef _WIN32
 	std::string strRootPath = getExePath();
+
+#ifdef _WIN32
 	std::string strLogFullName = strRootPath + "\\" + "*.log";
 
 	intptr_t Handle;
 	struct _finddata_t FileInfo;
-	if ((Handle = _findfirst(strLogFullName.c_str(), &FileInfo)) == -1L)
-	{
-		//printf("没有找到匹配的项目\n");
+	if ((Handle = _findfirst(strLogFullName.c_str(), &FileInfo)) == -1L) {
+		// printf("Can' find '*.log' file\n");
 		return;
 	}
-	else
-	{
+	else {
 		std::string curFullFn = strRootPath + "\\" + FileInfo.name;
-		judgeTimeAndDel(curFullFn);
-		while (_findnext(Handle, &FileInfo) == 0)
-		{
-			curFullFn = strRootPath + "\\" + FileInfo.name;
+		if (bOneMonth) {
 			judgeTimeAndDel(curFullFn);
-			//printf("%s\n", FileInfo.name);
+		}
+		else {	// Directly delete.
+			std::cout << curFullFn;
+			DelFile(curFullFn.c_str());
+			std::cout << " had deleted" << std::endl;
+		}
+
+		while (_findnext(Handle, &FileInfo) == 0) {
+			curFullFn = strRootPath + "\\" + FileInfo.name;
+			if (bOneMonth) {
+				judgeTimeAndDel(curFullFn);
+			}
+			else { // Directly delete.
+				std::cout << curFullFn;
+				DelFile(curFullFn.c_str());
+				std::cout << " had deleted" << std::endl;
+			}
 		}
 
 		_findclose(Handle);
 	}
 #else
+	unsigned int count = 0;		//临时计数，[0，SINGLENUM]  
+	char txtname[128];			//存放文本文件名  
+	DIR *dp;
+	struct dirent *dirp;
 
+	//打开指定目录  
+	if ((dp = opendir(strRootPath.c_str()) == NULL)
+	{
+		perror("opendir");
+	}
+
+	//开始遍历目录  
+	while ((dirp = readdir(dp)) != NULL)
+	{
+		//跳过'.'和'..'两个目录  
+		if (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
+			continue;
+
+		int size = strlen(dirp->d_name);
+
+		//如果是.wav文件，长度至少是5  
+		if (size<5)
+			continue;
+
+		//只存取.mp3扩展名的文件名  
+		if (strcmp((dirp->d_name + (size - 4)), ".mp3") != 0)
+			continue;
+
+		/*把文件名d_name 每SINGLENUM个写入一个文件，
+		**用一个变量count记录遍历到的文件的数量，
+		**每SINGLENUM个打开一个新文件
+		*/
+
+		if ((++count) > SINGLENUM)
+		{
+			fclose(fp);
+			times++;
+			sprintf(txtname, "%02d.txt", times);           //自动命名生成.txt文件                                        
+			if ((fp = fopen(txtname, "w+")) == NULL)
+			{
+				perror("fopen");
+				exit(EXIT_FAILURE);
+			}
+
+			count = 1;
+		}
+
+		fputs(dirp->d_name, fp);
+		fputs(" ", fp);                                  // 在一个filename结束之后，写入空格，方便脚本读取，进程转换操作  
+
+	}
+
+	fclose(fp);
+	closedir(dp);
 #endif
 }
 
 static std::string getLogFileName(std::string strLogFn)
 {
-	delOneMonthAgoLog();
-
 	time_t t = time(0);
 	char tmp[64];
 	strftime(tmp, sizeof(tmp), "%Y-%m-%d-%H-%M-%S", localtime(&t));
 
-	strLogFn = strLogFn.empty() ? "alg" : strLogFn;
-	return strLogFn + "_" + std::string(tmp) + ".log";
+	strLogFn = strLogFn.empty() ? LOG_NAME : strLogFn;
+
+	strLogFn = strLogFn + "_" + std::string(tmp) + ".log";
+
+	return strLogFn;
 }
-static std::string g_LogFileName = getLogFileName(std::string());
 
 CTAPI std::string getCurStrTime()
 {
@@ -150,10 +223,17 @@ CTAPI void printfLog(const char* pLogText)
 	printf("%s : %s\n", tmp, pLogText);
 }
 
-
-CTAPI void InitialLog(const char* pLogFn)
+CTAPI void InitialLog(const char* pLogFn, bool bLogNameAddTime, bool bDelOldLog)
 {
-	g_LogFileName = getLogFileName(pLogFn);
+	std::cout << "Start init log ..." << std::endl;
+
+	delOneMonthAgoLog(bDelOldLog ? false : true);
+
+	g_LogFileName = bLogNameAddTime ? getLogFileName(pLogFn) : (std::string(pLogFn) + ".log");
+
+	std::cout << "Init log finish, log name = " << g_LogFileName << std::endl 
+		<< "*********************************************************"
+		<< std::endl << std::endl;
 }
 
 

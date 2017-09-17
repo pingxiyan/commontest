@@ -1,6 +1,7 @@
 /*********************************************************
 * Licence plate detect and recognize related test tool
-* Sandy Yann. Sep. 11 2017
+* Sandy Yann. Sep. 11 2017: this was placed in 'test_lp.h'
+* September 17 2017: Chinses of all public part was instead of English. 
 *********************************************************/
 
 #ifndef _TEST_LP_H_
@@ -13,15 +14,24 @@ CTAPI cv::Mat getRoiFromMat1(cv::Mat src, cv::Rect roiRt);
 // 根据车牌位置的中心，向车牌四周按宽度比例扩边，图像外，补值110
 CTAPI cv::Mat getRoiFromMatByLpPos(cv::Mat src, cv::Rect tRtLp, float f32L, float f32R, float f32T, float f32B, int l32LpEx/*车牌扩边像素*/);
 
-/* 针对车牌位置答案，保存和查看工具，对应的答案读写函数,
-针对位置类的测试，其实都可以用这个答案读写	*/
+/* LP answer format struct */
 typedef struct
 {
-	std::vector<cv::Rect> vecRtPos;  // 一张图片中的车辆位置
-	std::string fileName;       // 当前图片的名字
-}TPosAns;  // 答案结构体
+	std::vector<cv::Rect> vecRtPos;	// All LP rectangles in one image.
+	std::string fileName;			// Current image full name.
+}TPosAns; 
 
+/**
+* brief@ Read lp answer from file.
+* return@ veter of struct of 'TPosAns'
+*/
 CTAPI std::vector<TPosAns> readPosAns(std::string strAnsFn);
+
+/**
+* brief@ Save lp answer to file.Format=filename|x,y,w,h|x1,y1,w1,h1...
+* param@ strAnsFn: the answer file name.
+* param@ tPosAns: the lp calibration result of one image.
+*/
 CTAPI void writePosAns(std::string strAnsFn, std::vector<TPosAns> tPosAns);
 
 #endif
@@ -60,6 +70,7 @@ inline TRect Rect2TRect(cv::Rect rt)
 	tRt.l32Height = rt.height;
 	return tRt;
 };
+
 inline cv::Rect TRect2Rect(TRect tRt)
 {
 	cv::Rect rt;
@@ -75,8 +86,13 @@ CTAPI bool parseVehLogoFileName(std::string strfn,
 	TRect& tLpPosition,
 	char s8Plate[64],
 	l32& l32LpHorizontalTheta);
-// 解析位置答案文件
-// 答案格式为：filename|x,y,w,h|x,y,w,h
+
+/**
+* brief@ Parse position answer file, is same to 'readPosAns', Answer format：filename|x,y,w,h|x,y,w,h
+* param@ strSetFn: the answer file name.
+* param@ vecFn: vector of all LP file full names.
+* param@ vvPosRt: first vector for all files, second vector for all rectangle of one file.
+*/
 CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<TRect> >& vvPosRt);
 CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<cv::Rect> >& vvPosRt);
 
@@ -86,7 +102,7 @@ CTAPI void  ConvertRGB2I420(u8 *puYUV420, u8 *pu8RGB, l32 l32Width, l32 l32Heigh
 CTAPI void FveCvtNV12BGR24(const u8 *puYUVSP, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride);
 CTAPI void FvevehI420BGR24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, BOOL bFlip);
 
-// yuv 转换成 mat
+// yuv convert to mat
 CTAPI cv::Mat Yuv2Mat(const char *pYuv420, int width, int height);
 
 CTAPI TImage* creatTImage(cv::Mat src, EImageType eImgType);
