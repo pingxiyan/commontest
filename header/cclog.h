@@ -1,4 +1,4 @@
-/*********************************************************
+/************************************************************************
 * Module: Log : example as follow
 int main(int argc, char** argv)
 {
@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 	POUT("pout test %d \n", 20);
 	return 0;
 }
-*********************************************************/
+************************************************************************/
 
 #ifndef _COMMON_TEST_LOG_H_
 #define _COMMON_TEST_LOG_H_
@@ -39,27 +39,24 @@ void printfLog(const char* pLogText);
 
 #define PERR(_format, ...) {\
 	char atext[1024] = { 0 };		\
-	sprintf(atext, "fail: %s_%d : ", __FUNCTION__, __LINE__);	\
+	sprintf(atext, "FAIL: %s_%d :: ", __FUNCTION__, __LINE__);	\
 	sprintf(atext + strlen(atext), _format, ##__VA_ARGS__);	\
 	printfLog(atext);			\
 }
 
 #define PWARNING(_format, ...) {\
 	char atext[1024] = { 0 };		\
-	sprintf(atext, "warning: %s_%d : ", __FUNCTION__, __LINE__);	\
+	sprintf(atext, "WARNING: %s_%d :: ", __FUNCTION__, __LINE__);	\
 	sprintf(atext + strlen(atext), _format, ##__VA_ARGS__);	\
 	printfLog(atext);			\
 }
 
-#define POUT(_format, ...) {	\
-	std::cout << __FUNCTION__ << " : " << __LINE__ << " << " ; \
-	printf(_format, ##__VA_ARGS__);		\
-}
-
-#define POUT2 std::cout << __FUNCTION__ << " : " << __LINE__ << " << " ;
-
+// Normalize printf.
 #define PLOG PrintfLogArg
 
-
+#define POUT(_format, ...) {	\
+	std::cout << __FUNCTION__ << "_" << __LINE__ << " :: " ; \
+	printf(_format, ##__VA_ARGS__);		\
+}
 
 #endif /* _COMMON_TEST_LOG_H_ */

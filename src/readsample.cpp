@@ -366,7 +366,7 @@ static std::vector<TRect> getAllAnsPos(std::string strTemp)
 	{
 		TRect rt;
 		sscanf(strTemp.c_str(), "%d,%d,%d,%d", &rt.l32Left, &rt.l32Top, &rt.l32Width, &rt.l32Height);
-		int p = strTemp.find('|');
+		size_t p = strTemp.find('|');
 		if (p >= 0)
 		{
 			strTemp = strTemp.substr(p+1, strTemp.length());

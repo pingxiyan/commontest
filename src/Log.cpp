@@ -63,13 +63,11 @@ static void judgeTimeAndDel(std::string strFullFn)
 
 	std::cout << strFullFn << std::endl;
 
-	if (oldY == 0 || oldM == 0 || oldD == 0)
-	{
+	if (oldY == 0 || oldM == 0 || oldD == 0) {
 		return;
 	}
 
-	if (curY * 12 * 30 + curM * 30 + curD - oldY * 12 * 30 - oldM * 30 - oldD >= 28)
-	{
+	if (curY * 12 * 30 + curM * 30 + curD - oldY * 12 * 30 - oldM * 30 - oldD >= 28) {
 		DelFile(strFullFn.c_str());
 		std::cout << " had deleted! "<< std::endl;
 	}

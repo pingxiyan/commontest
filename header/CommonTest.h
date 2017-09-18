@@ -23,6 +23,7 @@
 
 #include "test_lp.h"
 #include "cclog.h"
+#include "config.h"
 
 // 从文件全路径名中，获取文件名字(\后面的部分)
 CTAPI std::string getFileNameFromFullName(std::string strFullName);
@@ -122,6 +123,7 @@ CTAPI void readHeader(FILE* pfOut, int& num);
 CTAPI void readHeader3P(FILE* pfOut, int& num, int &dim);
 
 CTAPI void writeText(FILE* pfOut, int val);
+CTAPI void writeText(FILE* pfOut, size_t val);
 CTAPI void writeText(FILE* pfOut, float val);
 CTAPI void writeText(FILE* pfOut, char val);
 CTAPI void writeVector(FILE* pfOut, std::vector<float> val);
@@ -160,7 +162,7 @@ inline BOOL readString2Buf(FILE* pfIn, char* pBuf, int bufSZ)
 	readText(pfIn, len);
 	if (len > bufSZ || len < 0)// 文件结尾
 	{
-		printf("Err: fun = ; lineNo = \n", __FUNCTION__, __LINE__);
+		printf("Err: fun = %s; lineNo = %d\n", __FUNCTION__, __LINE__);
 		return FALSE;
 	}
 
@@ -186,46 +188,14 @@ inline char* readArray(FILE* pfIn, int& len){
 CTAPI bool fileEof(FILE* pfIn);
 #endif
 
-// Parse config file part
-#if 1
-CTAPI void* readConfig(const char* ps8ConfigFn);
-CTAPI void releaseConfig(void**ppvHandle);
-
-CTAPI bool parseConfig(void* pvHandle, char* ps8Label, int &val);
-CTAPI bool parseConfig(void* pvHandle, char* ps8Label, float &val);
-CTAPI bool parseConfig(void* pvHandle, char* ps8Label, std::string & strOut);
-CTAPI bool parseConfig(void* pvHandle, char* ps8Label, bool &val);
-/* sample
-class CConfigParam
-{
-public:
-	CConfigParam(std::string strConfigFn)
-	{
-		m_pvHandle = readConfig(strConfigFn.c_str());
-		if (NULL == m_pvHandle)
-		{
-			std::cout << "can't open " << strConfigFn << " \n";
-			exit(0);
-		}
-
-		parseConfig(m_pvHandle, "m_strAlgType",	m_strAlgType);
-	}
-	~CConfigParam()
-	{
-		releaseConfig(&m_pvHandle);
-	}
-
-	std::string m_strAlgType;
-private:
-	void *m_pvHandle;
-	
-};
+/**
+* brief@ Get executable program folder.
 */
-#endif
-
 CTAPI std::string getExePath();
 
-// Return string, format = year-month-day h:m:s
+/**
+* brief@ Return string, format = year-month-day h:m:s
+*/
 CTAPI std::string getCurStrTime();
 
 /**

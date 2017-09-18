@@ -39,10 +39,16 @@ void writeText(FILE* pfOut, int val)
 	fwrite(&val, sizeof(int), 1, pfOut);
 }
 
+void writeText(FILE* pfOut, size_t val)
+{
+	fwrite(&val, sizeof(size_t), 1, pfOut);
+}
+
 void writeText(FILE* pfOut, float val)
 {
 	fwrite(&val, sizeof(float), 1, pfOut);
 }
+
 void writeText(FILE* pfOut, char val)
 {
 	fwrite(&val, sizeof(char), 1, pfOut);
@@ -50,9 +56,9 @@ void writeText(FILE* pfOut, char val)
 
 void writeVector(FILE* pfOut, std::vector<float> val)
 {
-	int total = val.size();
+	size_t total = val.size();
 	writeText(pfOut, total);
-	for (int i = 0; i < total; i++)
+	for (size_t i = 0; i < total; i++)
 	{
 		writeText(pfOut, val[i]);
 	}
@@ -174,7 +180,7 @@ std::vector<std::string> vecStrSection(int totalSection, int curId/*从0开始*/,
 									   std::vector<std::string> vecAll)
 {
 	std::vector<std::string> vecRes;
-	int onePartLen = vecAll.size() / totalSection;
+	int onePartLen = (int)vecAll.size() / totalSection;
 
 	// 最后一段
 	if (curId == totalSection - 1)
@@ -194,7 +200,7 @@ CTAPI std::vector<TImgSet> vecStrSection(int totalSection, int curId/*从0开始*/,
 										 std::vector<TImgSet> vecAll)
 {
 	std::vector<TImgSet> vecRes;
-	int onePartLen = vecAll.size() / totalSection;
+	int onePartLen = (int)vecAll.size() / totalSection;
 
 	// 最后一段
 	if (curId == totalSection - 1)

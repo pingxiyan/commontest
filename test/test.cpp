@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 	PERR("my error \n");
 	PWARNING("my WARNING \n");
 	POUT("pout test %d \n", 20);
-
+	PLOG("this is a log\n");
 	return 0;
 	return testGDB(argc, argv);
 	

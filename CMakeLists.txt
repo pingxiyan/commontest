@@ -1,6 +1,7 @@
 ﻿cmake_minimum_required(VERSION 2.8)
 
 set (TARGET_NAME commontest)
+set (TARGET_LIB_NAME libcommon)
 
 project(${TARGET_NAME})
 
@@ -24,17 +25,18 @@ message(STATUS "xxxxxxxx ${OpenCV_INCLUDE_DIRS}")
 # ---[ cpp/h file
 aux_source_directory(./header HEADERDIRS)
 aux_source_directory(./src/ DIRSRCS)
-aux_source_directory(./test/ DIRSRCS)
+aux_source_directory(./test/ DIRTESTS)
 
 # ---[ h file folder
 file(GLOB_RECURSE HEADERDIRS  *.h *.hpp)
 source_group("Include" FILES ${HEADERDIRS}) 
 
 # ---[ Add all files to Target project
-add_executable(${TARGET_NAME} ${HEADERDIRS} ${DIRSRCS})
+add_library(${TARGET_LIB_NAME} ${HEADERDIRS} ${DIRSRCS})
 
+add_executable(${TARGET_NAME} ${DIRTESTS})
 
-target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS})
+target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME})
 
 if(UNIX)
 target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} pthread.a)

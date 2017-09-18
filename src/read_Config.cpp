@@ -2,8 +2,7 @@
 * Read config file, myself format
 * Aug. 30 2017 Sandy Yann
 ***********************************************/
-#include "CommonTest.h"
-
+#include "config.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -143,7 +142,7 @@ bool parseConfig(void* pvHandle, char* ps8Label, int &val)
 	return false;
 }
 
-CTAPI bool parseConfig(void* pvHandle, char* ps8Label, bool &val)
+bool parseConfig(void* pvHandle, char* ps8Label, bool &val)
 {
 	int v = 0;
 	bool b = parseConfig(pvHandle, ps8Label, v);
