@@ -11,3 +11,6 @@ windows/
 ai_defs_kedacom.h
 /wintest
 /build
+/commontest.dir
+/x64
+/create_msvc_solution - 副本.bat
