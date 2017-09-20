@@ -1,372 +1,285 @@
-#include "CommonTest.h"
 #include "typedef.h"
+#include "color_space_convert.h"
 
+#define RANGE_UCHAR(x) ((x) > 255 ? 255 : ((x) < 0 ? 0 : (x)))
 
-#define Clip(x) ((x) > 255 ? 255 : ((x) < 0 ? 0 : (x)))
-/*=============================================================================
-函数名: ConvertRGB2NV12
-功   能: RGB转YUV
-算法实现: 
-全局变量: 无
-参   数: pu8RGB			RGB指针
-		  puYUV420   		YUV指针
-		  l32Width			图像宽度
-		  l32Height			图像高度
-返回值: 无
-=============================================================================*/
-void  ConvertRGB2NV12(u8 *puYUVSP, u8 *pu8RGB, l32 l32Width, l32 l32Height, l32 stride)
+/**
+* brief@ Color space convert: BGR24_to_NV12
+* param@ pNV12: src nv12
+* param@ pBGR24: dst BGR24
+* param@ width: image width
+* param@ height: image height
+* param@ ystep: 
+*/
+void bgr24_to_nv12(uint8_t *pNV12, uint8_t *pBGR24, int width, int height, int ystep)
 {
-    l32 l32w,l32h;
-    u8* pu8Y, *pu8UV;
-    u8* pu8RGBBuf;
-    l32 YSize;
-	l32 l32HalfWidth = l32Width >> 1;
-	l32 l32HalfHeight = l32Height >> 1;
+    int w, h, sizeY;
+	uint8_t* pY, *pUV, *pTmpBufBGR;
+	int halfW = width >> 1;
+	int halfH = height >> 1;
 
     // Y
-    for(l32h = 0; l32h < l32Height; l32h++)
+    for(h = 0; h < height; h++)
     {
-        pu8Y = puYUVSP + l32h * l32Width;
-        pu8RGBBuf = pu8RGB + l32h * stride;
+        pY = pNV12 + h * width;
+        pTmpBufBGR = pBGR24 + h * ystep;
 
-        for(l32w = 0; l32w < l32Width; l32w++)
+        for(w = 0; w < width; w++)
         {
-            pu8Y[0] = Clip(((66 * pu8RGBBuf[2] + 129 * pu8RGBBuf[1] + 25 * pu8RGBBuf[0] + 128) >> 8) + 16);
-            pu8Y++;
-            pu8RGBBuf += 3;
+            pY[0] = RANGE_UCHAR(((66 * pTmpBufBGR[2] + 129 * pTmpBufBGR[1] + 25 * pTmpBufBGR[0] + 128) >> 8) + 16);
+            pY++;
+            pTmpBufBGR += 3;
         }
     }
 
     // uv
-    YSize = l32Width * l32Height;
-    for(l32h = 0; l32h < l32HalfHeight; l32h++)
+    sizeY = width * height;
+    for(h = 0; h < halfH; h++)
     {
-        pu8UV = puYUVSP + l32h * l32Width + YSize;
-        //pu8RGBBuf = pu8RGB + l32h * 6 * l32Width + stride;
-		pu8RGBBuf = pu8RGB + l32h * 2 * stride + stride;
+        pUV = pNV12 + h * width + sizeY;
+		pTmpBufBGR = pBGR24 + h * 2 * ystep + ystep;
 
-        for(l32w = 0; l32w < l32HalfWidth; l32w++)
+        for(w = 0; w < halfW; w++)
         {
-            pu8UV[0] = Clip(((-38 * pu8RGBBuf[2] - 74 * pu8RGBBuf[1] + 112 * pu8RGBBuf[0] + 128) >> 8) + 128);
-            pu8UV[1] = Clip(((112 * pu8RGBBuf[5] - 94 * pu8RGBBuf[4] - 18 * pu8RGBBuf[3] + 128) >> 8) + 128);
-            pu8UV += 2;
-            pu8RGBBuf += 6;
+            pUV[0] = RANGE_UCHAR(((-38 * pTmpBufBGR[2] - 74 * pTmpBufBGR[1] + 112 * pTmpBufBGR[0] + 128) >> 8) + 128);
+            pUV[1] = RANGE_UCHAR(((112 * pTmpBufBGR[5] - 94 * pTmpBufBGR[4] - 18 * pTmpBufBGR[3] + 128) >> 8) + 128);
+            pUV += 2;
+            pTmpBufBGR += 6;
         }
     }
 }
 
-/*=============================================================================
-函数名: ConvertRGB2I420
-功   能: 
-算法实现: 无
-全局变量: 无
-参   数: 
-返回值: 无
-=============================================================================*/
-void  ConvertRGB2I420(u8 *puYUV420, u8 *pu8RGB, l32 l32Width, l32 l32Height, l32 l32Stride)
+/**
+* brief@ Color space convert: BGR24_to_YUV
+* param@ pNV12: src YUV, also called I420
+* param@ pBGR24: dst BGR24
+* param@ width: image width
+* param@ height: image height
+* param@ ystep:
+*/
+void bgr24_to_yuv(uint8_t *pYUV, uint8_t *pBGR24, int width, int height, int step)
 {
-	l32 l32w,l32h;
-	u8* pu8Y, *pu8U, *pu8V;
-	u8* pu8RGBBuf;
-	l32 l32YSize;
-	l32 l32FiveQuarterYSize;
-	l32 l32HalfWidth = l32Width >> 1;
-	l32 l32HalfHeight = l32Height >> 1;
+	int w, h, sizeY, sizeOff;
+	uint8_t *pY, *pU, *pV, *pTmpBufBGR;
+	int halfW = width >> 1, halfH = height >> 1;
 
 	// Y
-	for(l32h = l32Height - 1; l32h >= 0; l32h--)
-	{
-		pu8Y = puYUV420 + l32h * l32Width;
-		pu8RGBBuf = pu8RGB + l32h * l32Stride;
+	for(h = height - 1; h >= 0; h--) {
+		pY = pYUV + h * width;
+		pTmpBufBGR = pBGR24 + h * step;
 
-		for(l32w = 0; l32w < l32Width; l32w++)
-		{
-			pu8Y[0] = Clip(((66 * pu8RGBBuf[2] + 129 * pu8RGBBuf[1] + 25 * pu8RGBBuf[0] + 128) >> 8) + 16);
-			pu8Y++;
-			pu8RGBBuf += 3;
+		for(w = 0; w < width; w++) {
+			pY[0] = RANGE_UCHAR(((66 * pTmpBufBGR[2] + 129 * pTmpBufBGR[1] + 25 * pTmpBufBGR[0] + 128) >> 8) + 16);
+			pY++;
+			pTmpBufBGR += 3;
 		}
 	}
 
 	// u
-	l32YSize = l32Width * l32Height;
-	for(l32h = 0; l32h < l32HalfHeight; l32h++)
-	{
-		pu8U = puYUV420 + l32h * l32HalfWidth + l32YSize;
-		//pu8RGBBuf = pu8RGB + l32h * 6 * l32Width + l32Stride;
-		pu8RGBBuf = pu8RGB + l32h * 2 * l32Stride + l32Stride;
+	sizeY = width * height;
+	for(h = 0; h < halfH; h++) {
+		pU = pYUV + h * halfW + sizeY;
+		pTmpBufBGR = pBGR24 + h * 2 * step + step;
 
-		for(l32w = 0; l32w < l32HalfWidth; l32w++)
-		{
-			pu8U[0] = Clip(((-38 * pu8RGBBuf[2] - 74 * pu8RGBBuf[1] + 112 * pu8RGBBuf[0] + 128) >> 8) + 128);
-			pu8U++;
-			pu8RGBBuf += 6;
+		for(w = 0; w < halfW; w++) {
+			pU[0] = RANGE_UCHAR(((-38 * pTmpBufBGR[2] - 74 * pTmpBufBGR[1] + 112 * pTmpBufBGR[0] + 128) >> 8) + 128);
+			pU++;
+			pTmpBufBGR += 6;
 		}
 	}
 
 	// v
-	l32FiveQuarterYSize = l32YSize + (l32YSize >> 2);
-	for(l32h = 0; l32h < l32HalfHeight; l32h++)
-	{
-		pu8V = puYUV420 + l32h * l32HalfWidth + l32FiveQuarterYSize;
-		//pu8RGBBuf = pu8RGB + l32h * 6 * l32Width + l32Stride + 3;
-		pu8RGBBuf = pu8RGB + l32h * 2 * l32Stride + l32Stride + 3;
+	sizeOff = sizeY + (sizeY >> 2);
+	for(h = 0; h < halfH; h++) {
+		pV = pYUV + h * halfW + sizeOff;
+		pTmpBufBGR = pBGR24 + h * 2 * step + step + 3;
 
-		for(l32w = 0; l32w < l32HalfWidth; l32w++)
-		{
-			pu8V[0] = Clip(((112 * pu8RGBBuf[2] - 94 * pu8RGBBuf[1] - 18 * pu8RGBBuf[0] + 128) >> 8) + 128);
-			pu8V++;
-			pu8RGBBuf += 6;
+		for(w = 0; w < halfW; w++) {
+			pV[0] = RANGE_UCHAR(((112 * pTmpBufBGR[2] - 94 * pTmpBufBGR[1] - 18 * pTmpBufBGR[0] + 128) >> 8) + 128);
+			pV++;
+			pTmpBufBGR += 6;
 		}
 	}
 }
 
-
-#define Clip(x) ((x) > 255 ? 255 : ((x) < 0 ? 0 : (x)))
-
-void FveCvtNV12BGR24(const u8 *puYUVSP, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride)
+/**
+* brief@ nv12_to_bgr24, color space convert, fix-point calculate.
+* param@ pNV12: src NV12 image
+* param@ width: NV12 width
+* param@ height: NV12 height
+* param@ pBGR24: Out BGR24 image, size = width * height * 3
+*/
+void nv12_to_bgr24(const uint8_t *pNV12, int width, int height, uint8_t *pBGR24)
 {
-	l32 l32w,l32h;
-	u8* pu8Y, *pu8UV;
-	u8* pu8RGBBuf;
-	u8 u8Y, u8U, u8V;
-	l32 l32YSize;
-	l32 l32HalfWidth;
-	l32 l32Stride;
+	int w, h, tmp1, tmp2, tmp3;
+	const uint8_t* pY, *pUV;
+	uint8_t* pTmpBGRBuf;
+	int halfWidth = width >> 1;
+	
+	pTmpBGRBuf = pBGR24;
+	pY = pNV12;
+	pUV = pNV12 + width * height;
+	for(h = 0; h < height; h++) {
+		for(w = 0; w < width; w++) {
+			uint8_t curY = pY[0];
+			uint8_t curU = pUV[(h >> 1) * width + (w&0XFFFE)];
+			uint8_t curV = pUV[(h >> 1) * width + (w&0XFFFE) + 1];
 
-	l32 l32C, l32D, l32E;
+			tmp1 = curY - 16;
+			tmp2 = curU - 128;
+			tmp3 = curV - 128;
+			
+			pTmpBGRBuf[0] = (uint8_t)(RANGE_UCHAR(1.164f * tmp1 + 2.018f * tmp2));
+			pTmpBGRBuf[1] = (uint8_t)(RANGE_UCHAR(1.164f * tmp1 - 0.813f * tmp3 + 0.391f * tmp2));
+			pTmpBGRBuf[2] = (uint8_t)(RANGE_UCHAR(1.164f * tmp1 + 1.596f * tmp3));
 
-	l32YSize = l32Width * l32Height;
-	l32HalfWidth = (l32Width >> 1);
-	l32Stride = l32Width * 3;
-
-	if (l32Height%2 == 1)// 最后一行，rgb=y
-	{
-		l32h = l32Height - 1;
-		pu8Y = (u8*)(puYUVSP + l32h * l32Width);
-		pu8RGBBuf = pu8RGB + l32h * l32Stride;
-		for(l32w = 0; l32w < l32Width; l32w++)
-		{
-			pu8RGBBuf[0] = pu8RGBBuf[1] = pu8RGBBuf[2] = pu8Y[0];
-			pu8RGBBuf+=3;
-			pu8Y ++;
+			pY++;
+			pTmpBGRBuf += 3;
 		}
-		l32Height--;
 	}
 
-	pu8UV = (u8*)(puYUVSP + l32YSize);
-	for(l32h = 0; l32h < l32Height; l32h++)
-	{
-		pu8Y = (u8*)(puYUVSP + l32h * l32Width);
-		pu8RGBBuf = pu8RGB + l32h * l32Stride;
-
-		for(l32w = 0; l32w < l32Width; l32w++)
-		{
-			u8Y = pu8Y[0]; 
-			u8U = pu8UV[(l32h >> 1) * l32Width + (l32w&0XFFFE)];
-			u8V = pu8UV[(l32h >> 1) * l32Width + (l32w&0XFFFE) + 1];
-
-			l32C = u8Y - 16;
-			l32D = u8U - 128;
-			l32E = u8V - 128;
-
-			pu8RGBBuf[0] = (u8)(Clip(( 298 * l32C + 516 * l32D + 128) >> 8));
-			pu8RGBBuf[1] = (u8)(Clip(( 298 * l32C - 100 * l32D - 208 * l32E + 128) >> 8));
-			pu8RGBBuf[2] = (u8)(Clip(( 298 * l32C  + 409 * l32E + 128) >> 8));
-
-			pu8Y++;
-			pu8RGBBuf += 3;
+	/* If height is not even number, need to process last line data */
+	if (height % 2 == 1) {
+		h = height - 1;
+		pY = (pNV12 + h * width);
+		pTmpBGRBuf = pBGR24 + h * width * 3;
+		for (w = 0; w < width; w++) {
+			pTmpBGRBuf[0] = pTmpBGRBuf[1] = pTmpBGRBuf[2] = pY[0];
+			pTmpBGRBuf += 3;
+			pY++;
 		}
+		height--;
 	}
 }
 
-void FvevehI420BGR24(TImage *tYuvImg, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, BOOL bFlip)
+void nv12_to_bgr24_fixpoint(const uint8_t *pNV12, int width, int height, uint8_t *pBGR24)
 {
-    l32 l32w,l32h;
-    u8 *pu8Y, *pu8U, *pu8V;
-    u8 *pu8RGBBuf;
-    u8 u8Y, u8U, u8V;
-    l32 l32HalfWidth;
-    //l32 l32Stride;
-    l32 l32C, l32D, l32E;
-	int nImgSize = l32Width * l32Height;
+	int w, h, tmp1, tmp2, tmp3;
+	const uint8_t* pY, *pUV;
+	uint8_t* pTmpBGRBuf;
+	int halfWidth = width >> 1;
 
-    l32HalfWidth = (l32Width >> 1);
-    //l32Stride = l32Width * 3;
+	pTmpBGRBuf = pBGR24;
+	pY = pNV12;
+	pUV = pNV12 + width * height;
+	for (h = 0; h < height; h++) {
+		for (w = 0; w < width; w++) {
+			uint8_t curY = pY[0];
+			uint8_t curU = pUV[(h >> 1) * width + (w & 0XFFFE)];
+			uint8_t curV = pUV[(h >> 1) * width + (w & 0XFFFE) + 1];
 
-    // Y
-    pu8Y = (u8 *)tYuvImg->pu8Data;
-	pu8U = (u8 *)tYuvImg->pu8Data + nImgSize;
-	pu8V = (u8 *)tYuvImg->pu8Data + nImgSize * 5 / 4;
-    for(l32h = 0; l32h < l32Height; l32h++)
-    {
-        pu8Y = (u8*)((u8 *)tYuvImg->pu8Data + l32h * l32Width);
-        if(bFlip)
-        {
-            pu8RGBBuf = (u8*)(pu8RGB + (l32Height - l32h - 1) * l32DstStride);
-        }
-        else
-        {
-            pu8RGBBuf = (u8*)(pu8RGB + (l32h) * l32DstStride);
-        }
+			tmp1 = curY - 16;
+			tmp2 = curU - 128;
+			tmp3 = curV - 128;
 
-        for(l32w = 0; l32w < l32Width; l32w++)
-        {
-            u8Y = pu8Y[0]; 
-            u8U = pu8U[(l32h >> 1) * l32HalfWidth + (l32w >> 1)];
-            u8V = pu8V[(l32h >> 1) * l32HalfWidth + (l32w >> 1)];
+			pTmpBGRBuf[0] = (uint8_t)(RANGE_UCHAR((298 * tmp1 + 516 * tmp2 + 128) >> 8));
+			pTmpBGRBuf[1] = (uint8_t)(RANGE_UCHAR((298 * tmp1 - 100 * tmp2 - 208 * tmp3 + 128) >> 8));
+			pTmpBGRBuf[2] = (uint8_t)(RANGE_UCHAR((298 * tmp1 + 409 * tmp3 + 128) >> 8));
 
-            l32C = u8Y - 16;
-            l32D = u8U - 128;
-            l32E = u8V - 128;
+			pY++;
+			pTmpBGRBuf += 3;
+		}
+	}
 
-            pu8RGBBuf[0] = (u8)(Clip(( 298 * l32C + 516 * l32D + 128) >> 8));
-            pu8RGBBuf[1] = (u8)(Clip(( 298 * l32C - 100 * l32D - 208 * l32E + 128) >> 8));
-            pu8RGBBuf[2] = (u8)(Clip(( 298 * l32C  + 409 * l32E + 128) >> 8));
-
-            pu8Y++;
-            pu8RGBBuf += 3;
-        }
-    }
-
-	/*Mat bgr(l32Height, l32Width, CV_8UC3, pu8RGB);
-	namedWindow("bgr", 0);
-	imshow("bgr", bgr);
-	waitKey();*/
+	/* If height is not even number, need to process last line data */
+	if (height % 2 == 1) {
+		h = height - 1;
+		pY = (pNV12 + h * width);
+		pTmpBGRBuf = pBGR24 + h * width * 3;
+		for (w = 0; w < width; w++) {
+			pTmpBGRBuf[0] = pTmpBGRBuf[1] = pTmpBGRBuf[2] = pY[0];
+			pTmpBGRBuf += 3;
+			pY++;
+		}
+		height--;
+	}
 }
 
-void Yuv420ToBGR24(const char *pYuv, l32 l32Width, l32 l32Height, u8 *pu8RGB, l32 l32DstStride, bool bFlip)
+/**
+* brief@ YUV_to_BGR24, color space convert, fix-point calculate.
+* param@ pYUV: src YUV image
+* param@ width: YUV width
+* param@ height: YUV height
+* param@ pBGR24: Out BGR24 image, size = width * height * 3
+*/
+void yuv_to_bgr24_fixpoint(const uint8_t *pYUV, int width, int height, uint8_t *pBGR24)
 {
-    l32 l32w,l32h;
-    u8 *pu8Y, *pu8U, *pu8V;
-    u8 *pu8RGBBuf;
-    u8 u8Y, u8U, u8V;
-    l32 l32HalfWidth;
-    l32 l32C, l32D, l32E;
+	int w, h, tmp1, tmp2, tmp3;
+	const uint8_t *pY, *pU, *pV;
+	uint8_t *pBufBGR;
+	int l32HalfWidth = (width >> 1);
 
-    l32HalfWidth = (l32Width >> 1);
+	pY = pYUV;
+	pU = pY + width * height;
+	pV = pU + ((width * height) >> 2);
+	pBufBGR = pBGR24;
 
-    // Y
-    pu8Y = (u8 *)pYuv;
-    pu8U = (u8 *)pYuv + l32Width * l32Height;
-    pu8V = (u8 *)pu8U + l32Width * l32Height / 4;
-    for(l32h = 0; l32h < l32Height; l32h++)
-    {
-        pu8Y = (u8*)((u8 *)pYuv + l32h * l32Width);
-        if(bFlip)
-        {
-            pu8RGBBuf = (u8*)(pu8RGB + (l32Height - l32h - 1) * l32DstStride);
-        }
-        else
-        {
-            pu8RGBBuf = (u8*)(pu8RGB + (l32h) * l32DstStride);
-        }
+	for (h = 0; h < height; h++) {
+		for (w = 0; w < width; w++) {
+			uint8_t curY = pY[0];
+			int idxUV = (h >> 1) * l32HalfWidth + (w >> 1);
+			uint8_t curU = pU[idxUV];
+			uint8_t curV = pV[idxUV];
 
-        for(l32w = 0; l32w < l32Width; l32w++)
-        {
-            u8Y = pu8Y[0]; 
-            u8U = pu8U[(l32h >> 1) * l32HalfWidth + (l32w >> 1)];
-            u8V = pu8V[(l32h >> 1) * l32HalfWidth + (l32w >> 1)];
+			tmp1 = (int)curY - 16;
+			tmp2 = (int)curU - 128;
+			tmp3 = (int)curV - 128;
 
-            l32C = u8Y - 16;
-            l32D = u8U - 128;
-            l32E = u8V - 128;
+			pBufBGR[0] = (uint8_t)(RANGE_UCHAR((298 * tmp1 + 516 * tmp2 + 128) >> 8));
+			pBufBGR[1] = (uint8_t)(RANGE_UCHAR((298 * tmp1 - 100 * tmp2 - 208 * tmp3 + 128) >> 8));
+			pBufBGR[2] = (uint8_t)(RANGE_UCHAR((298 * tmp1 + 409 * tmp3 + 128) >> 8));
 
-            pu8RGBBuf[0] = (u8)(Clip(( 298 * l32C + 516 * l32D + 128) >> 8));
-            pu8RGBBuf[1] = (u8)(Clip(( 298 * l32C - 100 * l32D - 208 * l32E + 128) >> 8));
-            pu8RGBBuf[2] = (u8)(Clip(( 298 * l32C  + 409 * l32E + 128) >> 8));
-
-            pu8Y++;
-            pu8RGBBuf += 3;
-        }
-    }
-
-	/*Mat bgr(l32Height, l32Width, CV_8UC3, pu8RGB);
-	namedWindow("bgr", 0);
-	imshow("bgr", bgr);
-	waitKey();*/
+			pY++;
+			pBufBGR += 3;
+		}
+	}
 }
-
-TImage* creatTImage(cv::Mat src, EImageType eImgType)
+// same to yuv_to_bgr24_fixpoint
+void yuv_to_bgr24(const uint8_t *pYUV, int width, int height, uint8_t *pBGR24)
 {
-	TImage* ptImg = new TImage();
-	int nWidth = src.cols;
-	int nHeight = src.rows;
-	u8 * pu8YUV420 = new u8[src.step * src.rows];
+	int w, h, tmp1, tmp2, tmp3;
+	const uint8_t *pY, *pU, *pV;
+	uint8_t *pBufBGR;
+	int l32HalfWidth = (width >> 1);
 
-	ptImg->u32Type = eImgType; //NV12; //I420;
-	ptImg->l32Width = nWidth;
-	ptImg->l32Height = nHeight;
+	pY = pYUV;
+	pU = pY + width * height;
+	pV = pU + ((width * height) >> 2);
+	pBufBGR = pBGR24;
 
-	if (I420 == eImgType || NV12 == eImgType)
-	{
-		ptImg->l32Stride = nWidth;
-		ptImg->pu8Data = pu8YUV420;
+	for (h = 0; h < height; h++) {
+		for (w = 0; w < width; w++) {
+			uint8_t curY = pY[0];
+			int idxUV = (h >> 1) * l32HalfWidth + (w >> 1);
+			uint8_t curU = pU[idxUV];
+			uint8_t curV = pV[idxUV];
 
-		if(I420 == eImgType)
-		{
-			ConvertRGB2I420(pu8YUV420, src.data, nWidth, nHeight, src.step);
+			tmp1 = (int)curY - 16;
+			tmp2 = (int)curU - 128;
+			tmp3 = (int)curV - 128;
+
+			pBufBGR[0] = (uint8_t)(RANGE_UCHAR(1.164f * tmp1 + 2.018f * tmp2));
+			pBufBGR[1] = (uint8_t)(RANGE_UCHAR(1.164f * tmp1 - 0.813f * tmp3 + 0.391f * tmp2));
+			pBufBGR[2] = (uint8_t)(RANGE_UCHAR(1.164f * tmp1 + 1.596f * tmp3));
+
+			pY++;
+			pBufBGR += 3;
 		}
-		else
-		{
-			ConvertRGB2NV12(pu8YUV420, src.data, nWidth, nHeight, src.step);
-		}
-	}
-	else if(BGR24 == eImgType)
-	{
-		ptImg->l32Stride = src.step;
-		ptImg->pu8Data = pu8YUV420;
-
-		memcpy(pu8YUV420, src.data, src.step * src.rows);
-	}
-	else if(GRAY == eImgType)
-	{
-		if(src.channels() > 1)
-		{
-			cv::cvtColor(src,src, 6/*CV_BGR2GRAY*/);
-		}
-		ptImg->l32Stride = src.step;
-		ptImg->pu8Data = pu8YUV420;
-		memcpy(pu8YUV420, src.data, src.step * src.rows);
-	}
-	else
-	{
-		printf("Err: 目前不支持的类型");
-		delete[] pu8YUV420;
-		delete ptImg;
-		return NULL;
-	}
-
-	//cv::Mat maty = cv::Mat(ptImg->l32Height, ptImg->l32Width, CV_8UC1, ptImg->pu8Data);
-	//cv::imshow("y", maty);
-	//cv::Mat matu = cv::Mat(ptImg->atPlane[1].l32Height, ptImg->atPlane[1].l32Width, CV_8UC1, ptImg->atPlane[1].pu8Data);
-	//cv::imshow("matu", matu);
-	//cv::Mat matv = cv::Mat(ptImg->atPlane[2].l32Height, ptImg->atPlane[2].l32Width, CV_8UC1, ptImg->atPlane[2].pu8Data);
-	//cv::imshow("matv", matv);
-	//cv::waitKey();
-
-	return ptImg;
-}
-
-void releaesTImage(TImage** pptImg)
-{
-	TImage* ptImg = (TImage*)*pptImg;
-	if (ptImg)
-	{
-		if(ptImg->pu8Data) 
-		{
-			delete[] ptImg->pu8Data;
-		}
-		delete ptImg;
-		*pptImg = NULL;
 	}
 }
 
-// yuv 转换成 mat
-CTAPI cv::Mat Yuv2Mat(const char *pYuv420, int width, int height)
+/**
+* brief@ Convert YUV to OpenCV Mat(BGR24).
+* param@ pYUV: src YUV image, also called YUV420
+* param@ width: YUV width
+* param@ height: YUV height
+* return@ cv::Mat
+*/
+cv::Mat yuv_to_cvmat(const uint8_t *pYUV, int width, int height)
 {
 	cv::Mat src = cv::Mat(height, width, CV_8UC3);
 
-	Yuv420ToBGR24(pYuv420, width, height, src.data, src.step, false);
+	yuv_to_bgr24(pYUV, width, height, src.data);
 
 	return src;
 }

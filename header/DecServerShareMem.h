@@ -1,12 +1,16 @@
-/************************************************************************/
-/* 2017-03-19 SandyYann.
-	通过共享内存传递解码数据，注意事项如下：
-	1.共享内存的大小固定，解码视频如果过大，需要缩放图像再传递；	*/
-/************************************************************************/
+/************************************************************************
+* Brief@ Transfer decode raw data through shared memory,Note as follow:
+* 1: Shared memory size fixed, if deocde image size is more than shared memory size, please resize firstly.
+* 2: ..
+* Now, only support WINDOWS
+* 2017-03-19 SandyYann: Created.
+* Sep. 20 2017, Translate comment to English.	
+************************************************************************/
 
 #ifndef _DEC_SERVER_SHARE_MEM_H_
 #define _DEC_SERVER_SHARE_MEM_H_
 
+#ifdef _WIN32
 #include <Windows.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,7 +18,7 @@
 
 #define TIP_ERR_DSSM() printf("ERR:%s, %d\n", __FUNCTION__, __LINE__);
 
-// 固定大小，不能改变
+// Fixed shared memory size, and can't change dynamically.
 #define SHARE_MEM_SIZE (1920*2560*3/2)  
 
 typedef enum emShareMemState
@@ -33,13 +37,13 @@ typedef enum emDecResState
 
 typedef struct tagShareMemHeader
 {
-	EMShareMemState emState;	// 共享内存状态
+	EMShareMemState emState;	// Shared memory status.
 	int width;
 	int height;
-	int imgSize;		// 图像size
-	__int64 pts;		// 时间戳
-	__int64 frameId;	// 帧ID
-	EMDecResState emDRState;	// 是否解码完成
+	int imgSize;		// image size
+	__int64 pts;		// time stamp
+	__int64 frameId;	// frame index
+	EMDecResState emDRState;	// Whether if decored success.
 }TShareMemHeader;
 
 class CShareMemDecServer
@@ -257,6 +261,6 @@ private:
 
 	char* m_pBufCacheImg;
 };
+#endif  /* _WIN32 */
 
-
-#endif
+#endif /* _DEC_SERVER_SHARE_MEM_H_ */

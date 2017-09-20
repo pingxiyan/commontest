@@ -325,7 +325,7 @@ CTAPI void DelFile(const char* fn)
 bool parseVehLogoFileName(string strfn, 
 						  TRect& tLpPosition, 
 						  char s8Plate[64], 
-						  l32& l32LpHorizontalTheta)
+						  int& l32LpHorizontalTheta)
 {
 	//判断当前是否有车牌
 	char buffer[128];
@@ -338,16 +338,16 @@ bool parseVehLogoFileName(string strfn,
 	string stmp = s.substr(nPosss+1, s.length()-nPosss-6);
 	strcpy(buffer, stmp.c_str());
 	pLabel = strtok(buffer, ",");
-	tLpPosition.l32Left = atoi(pLabel);
+	tLpPosition.x = atoi(pLabel);
 
 	pLabel = strtok(NULL, ",");
-	tLpPosition.l32Top = atoi(pLabel);
+	tLpPosition.y = atoi(pLabel);
 
 	pLabel = strtok(NULL, ",");
-	tLpPosition.l32Width = atoi(pLabel);
+	tLpPosition.w = atoi(pLabel);
 
 	pLabel = strtok(NULL, ",");
-	tLpPosition.l32Height = atoi(pLabel);
+	tLpPosition.h = atoi(pLabel);
 
 	pLabel = strtok(NULL, ",");
 	strcpy(s8Plate, pLabel);
@@ -365,7 +365,7 @@ static std::vector<TRect> getAllAnsPos(std::string strTemp)
 	for (;;)
 	{
 		TRect rt;
-		sscanf(strTemp.c_str(), "%d,%d,%d,%d", &rt.l32Left, &rt.l32Top, &rt.l32Width, &rt.l32Height);
+		sscanf(strTemp.c_str(), "%d,%d,%d,%d", &rt.x, &rt.y, &rt.w, &rt.h);
 		size_t p = strTemp.find('|');
 		if (p >= 0)
 		{
@@ -421,8 +421,8 @@ CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, st
 		std::vector<cv::Rect> vecCvRt;
 		for (size_t j = 0; j < vvPosMyRt[i].size(); j++)
 		{
-			vecCvRt.push_back(cv::Rect(vvPosMyRt[i][j].l32Left, 
-				vvPosMyRt[i][j].l32Top, vvPosMyRt[i][j].l32Width, vvPosMyRt[i][j].l32Height));
+			vecCvRt.push_back(cv::Rect(vvPosMyRt[i][j].x, 
+				vvPosMyRt[i][j].y, vvPosMyRt[i][j].w, vvPosMyRt[i][j].h));
 		}
 		vvPosRt.push_back(vecCvRt);
 	}

@@ -48,7 +48,7 @@ CTAPI void showRetrievalResut(vector<float> vecScore, std::vector<std::string> v
 #define show_rows_num 3
 #define SHOW_NUM (show_cols_num*show_rows_num)
 
-	int nShowNum = MIN(vecScore.size(), SHOW_NUM);
+	int nShowNum = (int)MIN(vecScore.size(), SHOW_NUM);
 
 	// ≈≈–Ú
 	std::vector<std::pair<float, int> > pairs;
