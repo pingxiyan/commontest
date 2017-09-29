@@ -2,7 +2,7 @@
 /* 功能：读取dir.set中的文件名列表，放到vector中输出
 	Sandy Yann	2015-11-24												*/
 /************************************************************************/
-#include "CommonTest.h"
+#include "common_test.h"
 
 #include <stdio.h>
 #include <stdlib.h>

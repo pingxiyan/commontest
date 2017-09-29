@@ -4,8 +4,7 @@
 	2016-04-02
 **************************************************************/
 
-#include "CommonTest.h"
-#include "cclog.h"
+#include "log.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -24,10 +23,11 @@
 #define SHOW_LOG_CONSOLE 1	// 
 #define LOG_NAME	"mylog"	// 
 
+static bool g_bWriteFile = false;
 static std::string g_LogFileName = LOG_NAME; //getLogFileName(std::string());
 
 #ifdef _WIN32
-CTAPI std::string getExePath()
+std::string getExePath()
 {
 	char szFilePath[MAX_PATH + 1] = { 0 };
 	GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
@@ -36,7 +36,7 @@ CTAPI std::string getExePath()
 	return path;
 }
 #else
-CTAPI std::string getExePath()
+std::string getExePath()
 {
 	char exec_name [1024] = {0};
 	readlink ("/proc/self/exe", exec_name, 1024);
@@ -44,9 +44,20 @@ CTAPI std::string getExePath()
 }
 #endif
 
+static std::string get_fn_from_fullfn(std::string fullfn)
+{
+#ifdef _WIN32
+	int pos = fullfn.rfind("\\");
+#else
+	int pos = fullfn.rfind("/");
+#endif
+	std::string fn = fullfn.substr(pos + 1, fullfn.length());
+	return fn;
+}
+
 static void judgeTimeAndDel(std::string strFullFn)
 {
-	std::string fn = getFileNameFromFullName(strFullFn);
+	std::string fn = get_fn_from_fullfn(strFullFn);
 	int curY = 0;
 	int curM = 0;
 	int curD = 0;
@@ -68,14 +79,14 @@ static void judgeTimeAndDel(std::string strFullFn)
 	}
 
 	if (curY * 12 * 30 + curM * 30 + curD - oldY * 12 * 30 - oldM * 30 - oldD >= 28) {
-		DelFile(strFullFn.c_str());
+		remove(strFullFn.c_str());
 		std::cout << " had deleted! "<< std::endl;
 	}
 }
 
 /**
-* brief@ Delete log.txt before more one month, or all '*.log' files
-* param@ bOneMonth: 
+* @brief Delete log.txt before more one month, or all '*.log' files
+* @param bOneMonth: 
 *	true: delete *.log created before one month.
 *	false: delete all *.log 
 */
@@ -99,7 +110,7 @@ static void delOneMonthAgoLog(bool bOneMonth)
 		}
 		else {	// Directly delete.
 			std::cout << curFullFn;
-			DelFile(curFullFn.c_str());
+			remove(curFullFn.c_str());
 			std::cout << " had deleted" << std::endl;
 		}
 
@@ -110,7 +121,7 @@ static void delOneMonthAgoLog(bool bOneMonth)
 			}
 			else { // Directly delete.
 				std::cout << curFullFn;
-				DelFile(curFullFn.c_str());
+				remove(curFullFn.c_str());
 				std::cout << " had deleted" << std::endl;
 			}
 		}
@@ -166,7 +177,7 @@ static std::string getLogFileName(std::string strLogFn)
 	return strLogFn;
 }
 
-CTAPI std::string getCurStrTime()
+std::string getCurStrTime()
 {
 	time_t t = time(0);
 	char tmp[64];
@@ -175,7 +186,7 @@ CTAPI std::string getCurStrTime()
 	return std::string(tmp);
 }
 
-CTAPI void printfLog(const char* pLogText)
+void printfLog(const char* pLogText)
 {
 	std::string strLogFullName = getExePath() + "\\" + g_LogFileName;
 
@@ -197,13 +208,14 @@ CTAPI void printfLog(const char* pLogText)
 	fprintf(g_pFOut, "%s : %s", tmp,  pLogText);
 	fflush(g_pFOut);
 	
-	printf("%s : %s\n", tmp, pLogText);
+	printf("%s %s\n", tmp, pLogText);
 }
 
-CTAPI void InitialLog(const char* pLogFn, bool bLogNameAddTime, bool bDelOldLog)
+void InitialLog(const char* pLogFn, bool bLogNameAddTime, bool bDelOldLog, bool bWriteFile)
 {
 	std::cout << "Start init log ..." << std::endl;
-
+	
+	g_bWriteFile = bWriteFile;
 	delOneMonthAgoLog(bDelOldLog ? false : true);
 
 	g_LogFileName = bLogNameAddTime ? getLogFileName(pLogFn) : (std::string(pLogFn) + ".log");
@@ -220,7 +232,7 @@ void subFun(int arr[])
 	arr[999999999] = 123;
 }
 /**
-*brief@ Learn to how to use GDB tool
+*@brief Learn to how to use GDB tool
 */
 int testGDB(int argc, char** argv)
 {

@@ -8,7 +8,7 @@
 2015-11-24    1.0         闫西平                    创建
 ******************************************************************************/
 
-#include "CommonTest.h"
+#include "common_test.h"
 
 #include <vector>
 #include <string>

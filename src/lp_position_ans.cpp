@@ -11,7 +11,7 @@
 ***********************************************************************/
 #include <opencv2/opencv.hpp>
 #include "typedef.h"
-#include "CommonTest.h"
+#include "common_test.h"
 
 std::vector<TPosAns> readPosAns(std::string strAnsFn)
 {

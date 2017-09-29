@@ -3,16 +3,16 @@
 *	Sandy Yann
 *	2016-1-4															
 /************************************************************************/
-#include "CommonTest.h"
+#include "common_test.h"
 
 #ifdef _WIN32
 #include <Windows.h>
 #endif
 
 /**
-*brief@ Create path based file name, eg. /home/xx/xx.bmp
-*param@ strFn : File name string
-*return@ TRUE or FALSE
+*@brief Create path based file name, eg. /home/xx/xx.bmp
+*@param strFn : File name string
+*@return TRUE or FALSE
 */
 BOOL createPath(std::string strFn)
 {
@@ -38,9 +38,9 @@ BOOL createPath(std::string strFn)
 }
 
 /**
-*brief@ Fast copy one file to destination file 
-*param@ strSrcFn : Copyed file
-*param@ strDstFn : Destination file
+*@brief Fast copy one file to destination file 
+*@param strSrcFn : Copyed file
+*@param strDstFn : Destination file
 */
 void copyFile2DstFn(std::string strSrcFn, std::string strDstFn)
 {

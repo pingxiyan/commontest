@@ -5,7 +5,7 @@
 #include <Windows.h>
 #endif
 
-#include "CommonTest.h"
+#include "common_test.h"
 
 typedef struct tagThrdParam
 {

@@ -5,7 +5,7 @@ Sandy Yann
 ******************************************************************************/
 
 #include <string.h>
-#include "CommonTest.h"
+#include "common_test.h"
 #include <opencv2/opencv.hpp>
 #include "typedef.h"
 
@@ -102,12 +102,12 @@ cv::Mat getRoiFromMatByLpPos(cv::Mat src, cv::Rect tRtLp, float f32L,float f32R,
 }
 
 /**
-* brief@ Get roi image from NV12.
-* param@ pNV12: src nv12 image.
-* param@ width: nv12 width
-* param@ height: nv12 height
-* param@ rtRoi: ROI
-* param@ pNV12ROI: Out roi NV12 image.
+* @brief Get roi image from NV12.
+* @param pNV12: src nv12 image.
+* @param width: nv12 width
+* @param height: nv12 height
+* @param rtRoi: ROI
+* @param pNV12ROI: Out roi NV12 image.
 */
 void getRoiNV12(const uint8_t* pNV12, int width, int height, cv::Rect rtRoi, uint8_t* pNV12ROI)
 {
@@ -139,10 +139,10 @@ void getRoiNV12(const uint8_t* pNV12, int width, int height, cv::Rect rtRoi, uin
 }
 
 /**
-* brief@ Get roi image from NV12 image.
-* param@ w: NV12 image width
-* param@ h: NV12 image height
-* param@ rtRoi: ROI, member must be even numbers.
+* @brief Get roi image from NV12 image.
+* @param w: NV12 image width
+* @param h: NV12 image height
+* @param rtRoi: ROI, member must be even numbers.
 */
 cv::Mat getRoiFromNV12(const uint8_t* pNV12, int width, int height, cv::Rect rtRoi)
 {

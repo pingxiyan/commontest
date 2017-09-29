@@ -198,7 +198,7 @@ bool parseConfig(void* pvHandle, char* ps8Label, string & strOut)
 }
 
 /**
-*brief@ read one line from FILE handle
+*@brief read one line from FILE handle
 */
 static char* readOneRowInFile(FILE* pF, int &len, bool &bEOF)
 {

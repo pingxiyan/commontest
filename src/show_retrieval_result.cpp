@@ -1,4 +1,4 @@
-#include "CommonTest.h"
+#include "common_test.h"
 
 using std::vector;
 using std::string;
