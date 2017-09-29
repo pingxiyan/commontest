@@ -26,6 +26,11 @@
 static bool g_bWriteFile = false;
 static std::string g_LogFileName = LOG_NAME; //getLogFileName(std::string());
 
+/**
+* @param log need to support multi-thread.
+*/
+
+
 #ifdef _WIN32
 std::string getExePath()
 {
