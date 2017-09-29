@@ -17,20 +17,20 @@ CTAPI cv::Mat getRoiFromMat1(cv::Mat src, cv::Rect roiRt);
 CTAPI cv::Mat getRoiFromMatByLpPos(cv::Mat src, cv::Rect tRtLp, float f32L, float f32R, float f32T, float f32B, int l32LpEx/*³µÅÆÀ©±ßÏñËØ*/);
 
 /**
-* brief@ Get roi image from NV12.
-* param@ pNV12: src nv12 image.
-* param@ width: nv12 width
-* param@ height: nv12 height
-* param@ rtRoi: ROI
-* param@ pNV12ROI: Out roi NV12 image.
+* @brief Get roi image from NV12.
+* @param pNV12: src nv12 image.
+* @param width: nv12 width
+* @param height: nv12 height
+* @param rtRoi: ROI
+* @param pNV12ROI: Out roi NV12 image.
 */
 void getRoiNV12(const uint8_t* pNV12, int width, int height, cv::Rect rtRoi, uint8_t* pNV12ROI);
 
 /**
-* brief@ Get roi image from NV12 image.
-* param@ w: NV12 image width
-* param@ h: NV12 image height
-* param@ rtRoi: ROI, member must be even numbers.
+* @brief Get roi image from NV12 image.
+* @param w: NV12 image width
+* @param h: NV12 image height
+* @param rtRoi: ROI, member must be even numbers.
 */
 cv::Mat getRoiFromNV12(const uint8_t* pNV12, int w, int h, cv::Rect rtRoi);
 
@@ -42,15 +42,15 @@ typedef struct
 }TPosAns; 
 
 /**
-* brief@ Read lp answer from file.
-* return@ veter of struct of 'TPosAns'
+* @brief Read lp answer from file.
+* @return veter of struct of 'TPosAns'
 */
 CTAPI std::vector<TPosAns> readPosAns(std::string strAnsFn);
 
 /**
-* brief@ Save lp answer to file.Format=filename|x,y,w,h|x1,y1,w1,h1...
-* param@ strAnsFn: the answer file name.
-* param@ tPosAns: the lp calibration result of one image.
+* @brief Save lp answer to file.Format=filename|x,y,w,h|x1,y1,w1,h1...
+* @param strAnsFn: the answer file name.
+* @param tPosAns: the lp calibration result of one image.
 */
 CTAPI void writePosAns(std::string strAnsFn, std::vector<TPosAns> tPosAns);
 
@@ -203,10 +203,10 @@ CTAPI bool parseVehLogoFileName(std::string strfn,
 	int& l32LpHorizontalTheta);
 
 /**
-* brief@ Parse position answer file, is same to 'readPosAns', Answer format£ºfilename|x,y,w,h|x,y,w,h
-* param@ strSetFn: the answer file name.
-* param@ vecFn: vector of all LP file full names.
-* param@ vvPosRt: first vector for all files, second vector for all rectangle of one file.
+* @brief Parse position answer file, is same to 'readPosAns', Answer format£ºfilename|x,y,w,h|x,y,w,h
+* @param strSetFn: the answer file name.
+* @param vecFn: vector of all LP file full names.
+* @param vvPosRt: first vector for all files, second vector for all rectangle of one file.
 */
 CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<TRect> >& vvPosRt);
 CTAPI void parsePosAns(std::string strSetFn, std::vector<std::string>& vecFn, std::vector<std::vector<cv::Rect> >& vvPosRt);

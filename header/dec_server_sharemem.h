@@ -1,5 +1,5 @@
 /************************************************************************
-* Brief@ Transfer decode raw data through shared memory,Note as follow:
+* @brief Transfer decode raw data through shared memory,Note as follow:
 * 1: Shared memory size fixed, if deocde image size is more than shared memory size, please resize firstly.
 * 2: ..
 * Now, only support WINDOWS

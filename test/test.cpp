@@ -1,6 +1,6 @@
 #if 1
 
-#include "CommonTest.h"
+#include "common_test.h"
 #include <stdlib.h>
 #include "color_space_convert.h"
 
@@ -197,14 +197,15 @@ int unit_test_color_space_convert()
 
 int main(int argc, char** argv)
 {
-	return unit_test_color_space_convert();
+	//return unit_test_color_space_convert();
 
-	InitialLog("mylog", true, true);
+	InitialLog("mylog", false, true, false);
 
-	PERR("my error \n");
-	PWARNING("my WARNING \n");
-	POUT("pout test %d \n", 20);
-	PLOG("this is a log\n");
+	PERR("my error ");
+	PWARNING("my WARNING ");
+	//POUT("pout test %d ", 20);
+	PLOG("this is a log");
+	PLOG("test %d ", 20);
 	return 0;
 	return testGDB(argc, argv);
 	

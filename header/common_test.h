@@ -22,7 +22,7 @@
 #define CC_CHECK(condition) if(!(condition)){printf("FAIL:%s, %d\n", __FUNCTION__, __LINE__);}
 
 #include "test_lp.h"
-#include "cclog.h"
+#include "log.h"
 #include "config.h"
 
 // 从文件全路径名中，获取文件名字(\后面的部分)
@@ -189,17 +189,17 @@ CTAPI bool fileEof(FILE* pfIn);
 #endif
 
 /**
-* brief@ Get executable program folder.
+* @brief Get executable program folder.
 */
 CTAPI std::string getExePath();
 
 /**
-* brief@ Return string, format = year-month-day h:m:s
+* @brief Return string, format = year-month-day h:m:s
 */
 CTAPI std::string getCurStrTime();
 
 /**
-*brief@ Learn to how to use GDB tool
+*@brief Learn to how to use GDB tool
 */
 int testGDB(int argc, char** argv);
 

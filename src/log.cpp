@@ -205,7 +205,7 @@ void printfLog(const char* pLogText)
 	char tmp[64];
 	strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&t));
 
-	fprintf(g_pFOut, "%s : %s", tmp,  pLogText);
+	fprintf(g_pFOut, "%s %s", tmp,  pLogText);
 	fflush(g_pFOut);
 	
 	printf("%s %s\n", tmp, pLogText);
