@@ -98,16 +98,16 @@ inline TImage* creatTImage(cv::Mat src, ImgType eImgType)
 
 		if (YUV == eImgType)
 		{
-			bgr24_to_yuv((uint8_t*)pu8YUV420, (uint8_t*)src.data, nWidth, nHeight, src.step);
+			bgr24_to_yuv((uint8_t*)pu8YUV420, (uint8_t*)src.data, nWidth, nHeight, (int)src.step);
 		}
 		else
 		{
-			bgr24_to_nv12((uint8_t*)pu8YUV420, (uint8_t*)src.data, nWidth, nHeight, src.step);
+			bgr24_to_nv12((uint8_t*)pu8YUV420, (uint8_t*)src.data, nWidth, nHeight, (int)src.step);
 		}
 	}
 	else if (BGR24 == eImgType)
 	{
-		ptImg->step = src.step;
+		ptImg->step = (int)src.step;
 		ptImg->pu8Data = pu8YUV420;
 
 		memcpy(pu8YUV420, src.data, src.step * src.rows);
@@ -118,7 +118,7 @@ inline TImage* creatTImage(cv::Mat src, ImgType eImgType)
 		{
 			cv::cvtColor(src, src, 6/*CV_BGR2GRAY*/);
 		}
-		ptImg->step = src.step;
+		ptImg->step = (int)src.step;
 		ptImg->pu8Data = pu8YUV420;
 		memcpy(pu8YUV420, src.data, src.step * src.rows);
 	}
