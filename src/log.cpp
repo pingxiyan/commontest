@@ -5,6 +5,7 @@
 **************************************************************/
 
 #include "log.h"
+#include "thread.h"		// thread mutex
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -25,6 +26,7 @@
 
 static bool g_bWriteFile = false;
 static std::string g_LogFileName = LOG_NAME; //getLogFileName(std::string());
+static CThreadLock g_threadLock("log_mutex");
 
 /**
 * @param log need to support multi-thread.
@@ -193,6 +195,8 @@ std::string getCurStrTime()
 
 void printfLog(const char* pLogText)
 {
+	g_threadLock.lock();
+
 	std::string strLogFullName = getExePath() + "\\" + g_LogFileName;
 
 	static FILE* g_pFOut = NULL;
@@ -214,6 +218,8 @@ void printfLog(const char* pLogText)
 	fflush(g_pFOut);
 	
 	printf("%s %s\n", tmp, pLogText);
+
+	g_threadLock.unlock();
 }
 
 void InitialLog(const char* pLogFn, bool bLogNameAddTime, bool bDelOldLog, bool bWriteFile)

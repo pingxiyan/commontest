@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 void InitialLog(const char* pLogFn, bool bLogNameAddTime, bool bDelOldLog, bool bWriteFile);
 
 /**
-* @brief Printf log to file txt
+* @brief Printf log to file txt, multi-thread safe.
 * @param pLogText : log text
 */
 void printfLog(const char* pLogText);
