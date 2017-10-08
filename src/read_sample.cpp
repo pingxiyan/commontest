@@ -1,7 +1,15 @@
-/************************************************************************/
-/* 功能：读取dir.set中的文件名列表，放到vector中输出
-	Sandy Yann	2015-11-24												*/
-/************************************************************************/
+/************************************************************************
+* Read file name list from file[dir.set], and return vector.
+* 'dir.set' format as follow:
+* filename1.jpg
+* filename2.jpg
+* /home/myjpg/filename3.jpg
+* ...
+* Produce 'dir.set' commond line: 
+* Windows:	dir *.jpg /b/s > dir.set
+* Linux:	...
+* Sandy Yann Nov. 24 2015												
+************************************************************************/
 #include "common_test.h"
 
 #include <stdio.h>
@@ -12,10 +20,24 @@
 using std::string;
 using std::vector;
 
-// 从文件全路径名中，获取文件名字(\后面的部分)
+/**
+* @brief Window and linux path separator
+*/
+#ifdef _WIN32
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_SEPARATOR "/"
+#endif
+
+
+/**
+* @brief Get file name from full path name
+* @param strFullName: full path name
+* @return file name
+*/
 CTAPI std::string getFileNameFromFullName(std::string strFullName)
 {
-	int pos = strFullName.rfind("\\");
+	int pos = strFullName.rfind(PATH_SEPARATOR);
 	std::string fn = strFullName.substr(pos + 1, strFullName.length());
 	return fn;
 }
@@ -23,7 +45,7 @@ CTAPI std::string getFileNameFromFullName(std::string strFullName)
 // 从文件全路径名中，获取倒数第n级目录的名字，0=文件名，找不到返回空
 CTAPI std::string getDirNameFromFullName(std::string strFullName, int n/*倒数n级名字*/)
 {
-	int pos = strFullName.rfind("\\");
+	int pos = strFullName.rfind(PATH_SEPARATOR);
 	std::string strLeftDirFn;
 	if (n == 0)
 	{
@@ -33,7 +55,7 @@ CTAPI std::string getDirNameFromFullName(std::string strFullName, int n/*倒数n级
 	strLeftDirFn = strFullName.substr(0, pos);
 	for (int i = 1; i < n; i++)
 	{
-		pos = strLeftDirFn.rfind("\\");
+		pos = strLeftDirFn.rfind(PATH_SEPARATOR);
 		if (pos < 0)
 		{
 			return std::string();
@@ -42,7 +64,7 @@ CTAPI std::string getDirNameFromFullName(std::string strFullName, int n/*倒数n级
 	}
 
 	// 最后，返回倒数n级目录的名字
-	pos = strLeftDirFn.rfind("\\");
+	pos = strLeftDirFn.rfind(PATH_SEPARATOR);
 	if (pos < 0)
 	{
 		return std::string();

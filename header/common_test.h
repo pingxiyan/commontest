@@ -25,17 +25,22 @@
 #include "log.h"
 #include "config.h"
 
-// 从文件全路径名中，获取文件名字(\后面的部分)
+/**
+* @brief Get file name from full path name
+* @param strFullName: full path name
+* @return file name
+*/
 CTAPI std::string getFileNameFromFullName(std::string strFullName);
 
 // 从文件全路径名中，获取倒数第n级目录的名字，0=文件名，找不到返回空
 CTAPI std::string getDirNameFromFullName(std::string strFullName, int n/*倒数n级名字*/);
 
-/*=======================================================================
-Function : Read file name list  
-Param    : strFN[in] dir.set
-Return   : vector<string>
-=========================================================================*/
+
+/**
+* @brief Read file name list from file[dir.set], and return vector.
+* @param strFN: file names list. like 'dir.set'.
+* @return vector
+*/
 CTAPI std::vector<std::string> readsample(std::string strFN);
 CTAPI std::vector<std::string> readsample_from_dir(std::string rootdir);	// 读取文件夹下的所有文件
 CTAPI std::vector<std::string> readsample_from_dir_suffix(std::string rootdir, std::string suffix/*.c*/);	// 读取文件夹下的所有文件(某种后缀）
@@ -45,7 +50,11 @@ CTAPI std::vector<std::string> sampleChoose1DirNFile(std::vector<std::string> ve
 // 1个文件夹下，返回所有的文件名的vector
 CTAPI std::vector<std::string> sampleChooseOneDir(std::vector<std::string> vecFn, int startId);
 
-// 文件copy，源文件名到目的文件名
+
+/**
+* @brief Copy file fastly based on fread and fwrite
+* @param strSrcFn -> strDstFn
+*/
 CTAPI void copyFile2DstFn(std::string strSrcFn, std::string strDstFn);
 
 typedef struct

@@ -1,3 +1,10 @@
+/***************************************************
+* Multi-thread need mutex, support windows and linux.
+* Not need cpp file.
+* Sandy Yann.
+* Oct. 8 2017
+****************************************************/
+
 #ifndef _COMMON_TEST_THREAD_H_
 #define _COMMON_TEST_THREAD_H_
 
