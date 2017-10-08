@@ -19,8 +19,8 @@ find_package(OpenCV REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-message(STATUS "================= ${OpenCV_LIBS}")
-message(STATUS "xxxxxxxx ${OpenCV_INCLUDE_DIRS}")
+#message(STATUS "================= ${OpenCV_LIBS}")
+#message(STATUS "xxxxxxxx ${OpenCV_INCLUDE_DIRS}")
 
 # ---[ cpp/h file
 aux_source_directory(./header HEADERDIRS)
@@ -36,8 +36,10 @@ add_library(${TARGET_LIB_NAME} ${HEADERDIRS} ${DIRSRCS})
 
 add_executable(${TARGET_NAME} ${DIRTESTS})
 
-target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME})
-
 if(UNIX)
-target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} pthread.a)
+message(STATUS "=== LINUX ===")
+target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME} libpthread.a)
+else(UNIX)
+message(STATUS "=== WINDOWS ===")
+target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME})
 endif(UNIX)

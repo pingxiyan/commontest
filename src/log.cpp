@@ -7,17 +7,20 @@
 #include "log.h"
 #include "thread.h"		// thread mutex
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string>
+#include <iostream>
+#include <string.h>
+
 #ifdef _WIN32
 #include <Windows.h>
 #include <time.h>
-#include <string>
-#include <stdio.h>
-#include <stdlib.h>
 #include <io.h>
-#include <iostream>
 #else
 #include <sys/stat.h>
 #include <dirent.h>
+#include <unistd.h>
 #endif
 
 

@@ -7,6 +7,8 @@
 #include <vector>
 #include <iostream>
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 using std::string;
 using std::vector;
