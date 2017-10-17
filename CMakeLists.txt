@@ -38,7 +38,7 @@ add_executable(${TARGET_NAME} ${DIRTESTS})
 
 if(UNIX)
 message(STATUS "=== LINUX ===")
-target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME} libpthread.a)
+target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME} libpthread.so)
 else(UNIX)
 message(STATUS "=== WINDOWS ===")
 target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME})
