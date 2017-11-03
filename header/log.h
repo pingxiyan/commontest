@@ -43,7 +43,7 @@ void printfLog(const char* pLogText);
 }
 // Normalize printf.
 #define PLOG PrintfLogArg
-
+#define POUT PrintfLogArg
 
 #define PERR(_format, ...) {\
 	char atext[1024] = { 0 };		\

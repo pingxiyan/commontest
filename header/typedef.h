@@ -14,7 +14,7 @@ extern "C" {
 #include <stdint.h>
 
 // linux window difference part
-#ifdef WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #else	/* LINUX DATA TYPE*/
 #include <unistd.h>

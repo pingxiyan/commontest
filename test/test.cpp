@@ -1,4 +1,7 @@
-
+/**
+* @brief Linux code code support Chinese, you had better not to use Chinese.
+* Sandy Yann, 2017-11-03
+*/
 #if 1
 
 #include "common_test.h"
@@ -19,14 +22,14 @@ public:
 	{
 		FILE* pf = fopen("c:\\test.dat", "wb");
 		writeHeader(pf, 0);
-		writeString(pf, "c:\\yxp\\����ƽ\\xx.jpg");
+		writeString(pf, "c:\\yxp\\test\\xx.jpg");
 
 		char atext[1024] = {0};
 		writeArray(pf, atext, 1024);
 
-		writeString(pf, "c:\\yxp\\����ƽ\\xx1.jpg");
+		writeString(pf, "c:\\yxp\\test\\xx1.jpg");
 		writeArray(pf, atext, 1024);
-		writeString(pf, "c:\\yxp\\����ƽ\\xx2.jpg");
+		writeString(pf, "c:\\yxp\\test\\xx2.jpg");
 		writeArray(pf, atext, 1024);
 
 		writeHeader(pf, 3);

@@ -12,7 +12,7 @@
 #include <sys/stat.h>
 
 #ifdef _WIN32
-#include "w_dirent.h"
+#include "w_dirent.h"		// come from CV SDK(INTEL ICV Group) 
 #else
 #include <dirent.h>
 #endif
@@ -139,7 +139,7 @@ int args_parser(int argc, char** argv, Configuration& config)
     gflags::GetCommandLineFlagInfo("help", &infoHelp);
     if (FLAGS_h || (infoHelp.name == "help" && infoHelp.current_value == "true")) {
         showUsage();
-        return 1;
+		exit(-1);
     }
 
 	config._bVal = FLAGS_bval;
