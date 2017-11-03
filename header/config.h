@@ -17,6 +17,12 @@ bool parseConfig(void* pvHandle, char* ps8Label, int &val);
 bool parseConfig(void* pvHandle, char* ps8Label, float &val);
 bool parseConfig(void* pvHandle, char* ps8Label, std::string & strOut);
 bool parseConfig(void* pvHandle, char* ps8Label, bool &val);
+
+/**
+ * @brief the same name between label and variant.
+ */
+#define parse2(var) parseConfig(pv, ##var, var)
+
 /**************************************
 * Sample ******************************
 class CConfigParam

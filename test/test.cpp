@@ -1,8 +1,10 @@
+
 #if 1
 
 #include "common_test.h"
 #include <stdlib.h>
 #include "color_space_convert.h"
+#include "args_parser.h"
 
 #include <algorithm>
 #include <iostream>
@@ -17,14 +19,14 @@ public:
 	{
 		FILE* pf = fopen("c:\\test.dat", "wb");
 		writeHeader(pf, 0);
-		writeString(pf, "c:\\yxp\\ãÆÎ÷Æ½\\xx.jpg");
+		writeString(pf, "c:\\yxp\\ï¿½ï¿½ï¿½ï¿½Æ½\\xx.jpg");
 
 		char atext[1024] = {0};
 		writeArray(pf, atext, 1024);
 
-		writeString(pf, "c:\\yxp\\ãÆÎ÷Æ½\\xx1.jpg");
+		writeString(pf, "c:\\yxp\\ï¿½ï¿½ï¿½ï¿½Æ½\\xx1.jpg");
 		writeArray(pf, atext, 1024);
-		writeString(pf, "c:\\yxp\\ãÆÎ÷Æ½\\xx2.jpg");
+		writeString(pf, "c:\\yxp\\ï¿½ï¿½ï¿½ï¿½Æ½\\xx2.jpg");
 		writeArray(pf, atext, 1024);
 
 		writeHeader(pf, 3);
@@ -197,6 +199,8 @@ int unit_test_color_space_convert()
 
 int main(int argc, char** argv)
 {
+	return unit_test_args_parser(argc, argv);
+
 	//return unit_test_color_space_convert();
 
 	InitialLog("mylog", false, true, false);
@@ -211,7 +215,7 @@ int main(int argc, char** argv)
 	
 	//return testGetRoi();
 
-	//string sss = "G:\\search_Í¼Ïñ¼ìË÷\\common_Í¨ÓÃÄ¿±êËÑËØ\\Í¨ÓÃÄ¿±ê²âÊÔ¼¯1\\lib.set";
+	//string sss = "G:\\search_Í¼ï¿½ï¿½ï¿½ï¿½ï¿½\\common_Í¨ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½\\Í¨ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ï¿½Ô¼ï¿½1\\lib.set";
 	//std::vector<std::string> vecfn = readsample(sss);
  
 	//CTestFeaReadWrite tfrw;
@@ -219,7 +223,7 @@ int main(int argc, char** argv)
 
 	//testMultiThrdPart();
 
-	// std::string strSetFn = "D:\\svn_database\\trunk\\DiamondDetect_ÁâÐÎÍÖÔ²¼ì²âv6.0\\Í¼Æ¬\\Ô²ÐÎÍ¼Æ¬\\dir.set.ans";
+	// std::string strSetFn = "D:\\svn_database\\trunk\\DiamondDetect_ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô²ï¿½ï¿½ï¿½v6.0\\Í¼Æ¬\\Ô²ï¿½ï¿½Í¼Æ¬\\dir.set.ans";
 	// std::vector<std::string> vecFn;
 	// std::vector<std::vector<TRect> > vvPosRt;
 	// parsePosAns(strSetFn, vecFn, vvPosRt);

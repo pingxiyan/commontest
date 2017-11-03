@@ -5,6 +5,8 @@ set (TARGET_LIB_NAME libcommon)
 
 project(${TARGET_NAME})
 
+# ---[ cpp 11
+set(CMAKE_CXX_FLAGS   "-std=c++11")             # c++11
 
 # ---[ Version
 set(COMMON_TEST_VERSION "1.0.0.1")
@@ -13,7 +15,7 @@ set(COMMON_TEST_VERSION "1.0.0.1")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # ---[ Set Inlcude header file path
-include_directories(./header)
+include_directories(./header ${CMAKE_BINARY_DIR}/thirdparty/gflags/include)
 
 find_package(OpenCV REQUIRED)
 
@@ -31,6 +33,9 @@ aux_source_directory(./test/ DIRTESTS)
 file(GLOB_RECURSE HEADERDIRS  *.h *.hpp)
 source_group("Include" FILES ${HEADERDIRS}) 
 
+# ---[ third party libraries
+add_subdirectory(thirdparty/gflags)
+
 # ---[ Add all files to Target project
 add_library(${TARGET_LIB_NAME} ${HEADERDIRS} ${DIRSRCS})
 
@@ -38,8 +43,8 @@ add_executable(${TARGET_NAME} ${DIRTESTS})
 
 if(UNIX)
 message(STATUS "=== LINUX ===")
-target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME} libpthread.so)
+target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME} gflags libpthread.so)
 else(UNIX)
 message(STATUS "=== WINDOWS ===")
-target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME})
+target_link_libraries(${TARGET_NAME} ${OpenCV_LIBS} ${TARGET_LIB_NAME} gflags)
 endif(UNIX)
