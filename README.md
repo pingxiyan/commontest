@@ -11,6 +11,11 @@ Aug. 4 2017
 
 Initial version was writen during I worked at KEDACOM, Thanks KEDACOM for my first six years after graduation.
 
+# Window cmake use OpenCV
+OpenCV_DIR = "yourself git clone opencv code and build position"\build
+For example:
+OpenCV_DIR = C:\XipingYan_Code\OpenSourceCode\mygithub\opencv\build
+
 
 # Add gflags thirdparty lib, modify CMakeLists.txt as follow:
 include_directories(${CMAKE_BINARY_DIR}/thirdparty/gflags/include)
