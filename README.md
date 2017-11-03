@@ -17,4 +17,10 @@ include_directories(${CMAKE_BINARY_DIR}/thirdparty/gflags/include)
 add_subdirectory(thirdparty/gflags)
 target_link_libraries(${TARGET_NAME} gflags)
 
+gflags will be used as submodule
+Submodule usage:
+1: git submodule add https://github.com/gflags/gflags.git ./gflags	// add submodule
+2: git submodule init		// init submodule code folder
+3: git submodule update		// get submodule code
+
 #
