@@ -1,5 +1,5 @@
 /*
- * args_parser.cpp
+ * args_parser.cpp, add new parameter as follow 'unit_test_args_parser'
  *
  *  Created on: Nov 2, 2017
  *      Author: xiping
@@ -21,18 +21,6 @@
 
 #define DEFAULT_PATH_P "./lib"
 
-/**
- * @brief Parses arguments from the command line
- * @param argc - number of parameters passed
- * @param argv - vector of parameters passed
- * @param config - config object
- * @return exit code
- */
-int parseArgs(int argc, char *argv[], Configuration &config)
-{
-
-	return 1;
-}
 
 /// @brief message for help argument
 static const char help_message[] = "Print a usage message.";

@@ -13,7 +13,7 @@ ai_defs_kedacom.h
 /build
 /commontest.dir
 /x64
-/create_msvc_solution - 副本.bat
+/create_msvc_solution - *.bat
 libcommon.dir/
 CMakeFiles/
 .vs/
