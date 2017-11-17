@@ -14,7 +14,7 @@ Initial version was writen during I worked at KEDACOM, Thanks KEDACOM for my fir
 ## Window cmake use OpenCV
 OpenCV_DIR = "yourself git clone opencv code and build position"\build
 
-####For example:
+#### For example:
 OpenCV_DIR = C:\XipingYan_Code\OpenSourceCode\mygithub\opencv\build
 
 
@@ -26,7 +26,7 @@ target_link_libraries(${TARGET_NAME} gflags)<br>
 #### Submodule
 gflags will be used as submodule
 Submodule usage:
-1. git submodule add https://github.com/gflags/gflags.git ./gflags	// add submodule
-2. git submodule init		// init submodule code folder
-3. git submodule update		// get submodule code
+1. git submodule add https://github.com/gflags/gflags.git ./gflags <tb> // add submodule
+2. git submodule init	 <tb> // init submodule code folder
+3. git submodule update  <tb> // get submodule code
 
