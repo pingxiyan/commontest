@@ -13,14 +13,15 @@ Initial version was writen during I worked at KEDACOM, Thanks KEDACOM for my fir
 
 ## Window cmake use OpenCV
 OpenCV_DIR = "yourself git clone opencv code and build position"\build
+
 ####For example:
 OpenCV_DIR = C:\XipingYan_Code\OpenSourceCode\mygithub\opencv\build
 
 
 ## Add gflags thirdparty lib, modify CMakeLists.txt as follow:
-include_directories(${CMAKE_BINARY_DIR}/thirdparty/gflags/include)
-add_subdirectory(thirdparty/gflags)
-target_link_libraries(${TARGET_NAME} gflags)
+include_directories(${CMAKE_BINARY_DIR}/thirdparty/gflags/include)<br>
+add_subdirectory(thirdparty/gflags)<br>
+target_link_libraries(${TARGET_NAME} gflags)<br>
 
 #### Submodule
 gflags will be used as submodule
