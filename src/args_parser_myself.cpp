@@ -13,8 +13,6 @@
 #include <tuple>
 #include <cstdlib>
 
-static int _argc;
-static char** _argv;
 static std::vector<std::tuple<std::string, std::string, std::string> > _tupOption;
 
 /**
@@ -34,7 +32,7 @@ public:
 		}
 		else if (argc == 1) {
 			showUsage();
-			std::exit(EXIT_SUCCESS);	
+			std::exit(EXIT_SUCCESS);
 		}
 	};
 	~CPCLOption(){};
@@ -54,52 +52,43 @@ public:
 		return true;
 	}
 
+#define TRY_CATCH(FUNC)	try { (FUNC);}		\
+	catch (std::invalid_argument& e) {		\
+		std::cerr << option << " : " << "Caught " << e.what() << '\n';	\
+		std::exit(EXIT_FAILURE);}
+
 	void getOption(const std::string& option, std::string& val)
 	{
-		try {
-			val = getOpt(_argc, _argv, option);
-		} catch (std::bad_exception& e) {
-			std::cerr << "Caught " << e.what() << '\n';
-			std::exit(EXIT_FAILURE);
-		}
+		TRY_CATCH(val = getOpt(_argc, _argv, option));
 	}
+
 	void getOption(const std::string& option, int& val)
 	{
-		try {
-			val = std::stoi(getOpt(_argc, _argv, option));
-		} catch (std::bad_exception& e) {
-			std::cerr << "Caught " << e.what() << '\n';
-			std::exit(EXIT_FAILURE);
-		}
+		TRY_CATCH(val = std::stoi(getOpt(_argc, _argv, option)));
 	}
 	void getOption(const std::string& option, float& val)
 	{
-		try {
-			val = std::stof(getOpt(_argc, _argv, option));
-		} catch (std::bad_exception& e) {
-			std::cerr << "Caught " << e.what() << '\n';
-			std::exit(EXIT_FAILURE);
-		}
+		TRY_CATCH(val = std::stof(getOpt(_argc, _argv, option)));
 	}
 	void getOption(const std::string& option, double& val)
 	{
-		try {
-			val = std::stod(getOpt(_argc, _argv, option));
-		} catch (std::bad_exception& e) {
-			std::cerr << "Caught " << e.what() << '\n';
-			std::exit(EXIT_FAILURE);
-		}
+		TRY_CATCH(val = std::stod(getOpt(_argc, _argv, option)));
 	}
 	void getOption(const std::string& option, bool& val)
 	{
-		int ival = 0;
-		try {
-			ival = std::stoi(getOpt(_argc, _argv, option));
-			val = (bool)ival;
-		} catch (std::bad_exception& e) {
-			std::cerr << "Caught " << e.what() << '\n';
-			std::exit(EXIT_FAILURE);
+		std::string strVal = getOpt(_argc, _argv, option);
+		if (strVal == "true") {
+			val = true;
+			return;
 		}
+		else if (strVal == "false") {
+			val = false; 
+			return;
+		}
+
+		int ival = 0;
+		TRY_CATCH(ival = std::stoi(strVal));
+		val = (bool)ival;
 	}
 
 	static void showUsage()
@@ -108,7 +97,7 @@ public:
 		std::cout << __FUNCTION__ << " [OPTION]" << std::endl;
 		std::cout << "Options:" << std::endl;
 		std::cout << std::endl;
-		std::cout << "    -h" << std::endl;
+		std::cout << "    -h : help" << std::endl;
 		std::cout << "            " << "Parsing Command Line Parameter." << std::endl;
 
 		for (size_t i = 0; i < _tupOption.size(); i++) {
@@ -119,6 +108,9 @@ public:
 	}
 
 private:
+	int _argc;
+	char** _argv;
+
 	std::string getOpt(int argc, char* argv[], const std::string& option)
 	{
 		std::string cmd;
@@ -136,18 +128,15 @@ private:
 				cmd = argv[i + 1];
 				return cmd;
 			}
-			else
-			{
-				std::cout << "Can't find option [ " << option << " ], " << std::endl;
-				std::exit(EXIT_FAILURE);
-			}
 		}
+		
+		std::cout << "Can't find option [ " << option << " ], " << std::endl;
+		std::exit(EXIT_FAILURE);
 		return cmd;
 	}
 };
 
 bool bInitAllOption = CPCLOption::initAllOption();
-
 /**
  * @brief Parse command line parameter, like Linux.
  * All parameters will put into Configuration.
@@ -174,9 +163,8 @@ int unit_test_args_parser_myself(int argc, char** argv)
 	/**
 	 * @brief Add new variant step:
 	 * 1: add member variant for Configuration
-	 * 2: add DEFINE_bool(bval, false, bval_message);
-	 * 3: define variant brief 'bval_message';
-	 * 4: add readme for 'showUsage'
+	 * 2: add option description in 'initAllOption'
+	 * 3: get option by 'opt.getOption("-b", config._bVal);'
 	 */
 
 	Configuration config;
