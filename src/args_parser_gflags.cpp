@@ -1,5 +1,7 @@
 /*
- * args_parser.cpp, add new parameter as follow 'unit_test_args_parser'
+ * args_parser.cpp,
+ * Adding new parameter as follow 'unit_test_args_parser'
+ * Using third party library 'gflags'.
  *
  *  Created on: Nov 2, 2017
  *      Author: xiping
@@ -118,7 +120,7 @@ static void parseImagesArgs(std::vector<std::string> &images) {
  * @brief Parse command line parameter, like Linux.
  * All parameters will put into Configuration.
  */
-int args_parser(int argc, char** argv, Configuration& config)
+int args_parser_gflags(int argc, char** argv, Configuration& config)
 {
 	//gflags::ParseCommandLineFlags(&argc, &argv, true);
     gflags::ParseCommandLineNonHelpFlags(&argc, &argv, true);
@@ -142,7 +144,7 @@ int args_parser(int argc, char** argv, Configuration& config)
 /**
  * @brief args parser unit test
  */
-int unit_test_args_parser(int argc, char** argv)
+int unit_test_args_parser_gflags(int argc, char** argv)
 {
 	std::cout << __FUNCTION__ << " had entered!" << std::endl;
 
@@ -156,7 +158,7 @@ int unit_test_args_parser(int argc, char** argv)
 
 	Configuration config;
 
-	args_parser(argc, argv, config);
+	args_parser_gflags(argc, argv, config);
 
 
 #define POUT(N) std::cout << #N << " = " << N << std::endl;

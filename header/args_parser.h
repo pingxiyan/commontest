@@ -13,6 +13,7 @@
 #include <iostream>
 #include <vector>
 
+
 class Configuration
 {
 public:
@@ -31,12 +32,23 @@ public:
  * @brief Parse command line parameter, like Linux.
  * All parameters will put into Configuration.
  */
-int args_parser(int argc, char** argv, Configuration& config);
+int args_parser_gflags(int argc, char** argv, Configuration& config);
 
 /**
  * @brief argv_parse sample
  */
+int unit_test_args_parser_gflags(int argc, char** argv);
 
-int unit_test_args_parser(int argc, char** argv);
+
+/**
+ * @brief Parse command line parameter, like Linux.
+ * All parameters will put into Configuration.
+ */
+int args_parser_myself(int argc, char** argv, Configuration& config);
+
+/**
+ * @brief argv_parse sample
+ */
+int unit_test_args_parser_myself(int argc, char** argv);
 
 #endif /* HEADER_ARGS_PARSER_H_ */

@@ -202,7 +202,8 @@ int unit_test_color_space_convert()
 
 int main(int argc, char** argv)
 {
-	return unit_test_args_parser(argc, argv);
+	//return unit_test_args_parser_gflags(argc, argv);
+	return unit_test_args_parser_myself(argc, argv);
 
 	//return unit_test_color_space_convert();
 
