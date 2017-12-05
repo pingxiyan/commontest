@@ -52,6 +52,9 @@ public:
 		return true;
 	}
 
+#define FIND_OPT() std::string tmp = getOpt(_argc, _argv, option); \
+	if(tmp.empty()){ return; }
+
 #define TRY_CATCH(FUNC)	try { (FUNC);}		\
 	catch (std::invalid_argument& e) {		\
 		std::cerr << option << " : " << "Caught " << e.what() << '\n';	\
@@ -59,20 +62,24 @@ public:
 
 	void getOption(const std::string& option, std::string& val)
 	{
-		TRY_CATCH(val = getOpt(_argc, _argv, option));
+		FIND_OPT();
+		TRY_CATCH(val = tmp);
 	}
 
 	void getOption(const std::string& option, int& val)
 	{
-		TRY_CATCH(val = std::stoi(getOpt(_argc, _argv, option)));
+		FIND_OPT();
+		TRY_CATCH(val = std::stoi(tmp));
 	}
 	void getOption(const std::string& option, float& val)
 	{
-		TRY_CATCH(val = std::stof(getOpt(_argc, _argv, option)));
+		FIND_OPT();
+		TRY_CATCH(val = std::stof(tmp));
 	}
 	void getOption(const std::string& option, double& val)
 	{
-		TRY_CATCH(val = std::stod(getOpt(_argc, _argv, option)));
+		FIND_OPT();
+		TRY_CATCH(val = std::stod(tmp));
 	}
 	void getOption(const std::string& option, bool& val)
 	{
@@ -83,6 +90,9 @@ public:
 		}
 		else if (strVal == "false") {
 			val = false; 
+			return;
+		}
+		else if(strVal.empty()){
 			return;
 		}
 
