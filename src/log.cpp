@@ -5,13 +5,11 @@
 **************************************************************/
 
 #include "log.h"
-#include "thread.h"		// thread mutex
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
 #include <iostream>
-#include <string.h>
+#include <mutex>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -24,38 +22,32 @@
 #endif
 
 
-#define SHOW_LOG_CONSOLE 1	// 
 #define LOG_NAME	"mylog"	// 
 
-static bool g_bWriteFile = false;
-static std::string g_LogFileName = LOG_NAME; //getLogFileName(std::string());
-static CThreadLock g_threadLock("log_mutex");
-
+static bool g_bWriteFile = false;				// default not to write log file.
+static std::string g_LogFileName = LOG_NAME;	// default log name.
+static std::mutex g_output_mutex;
 /**
-* @param log need to support multi-thread.
-*/
-
-
+ * @brief Get executable path.
+ */
 #ifdef _WIN32
 std::string getExePath()
 {
-	char szFilePath[MAX_PATH + 1] = { 0 };
+	char szFilePath[MAX_PATH + 1] = {0};
 	GetModuleFileNameA(NULL, szFilePath, MAX_PATH);
 	(strrchr(szFilePath, '\\'))[0] = 0; //   
 	std::string path = szFilePath;
 	return path;
 }
 #else
-std::string getExePath()
-{
-	char exec_name [1024] = {0};
-	readlink ("/proc/self/exe", exec_name, 1024);
+std::string getExePath() {
+	char exec_name[1024] = { 0 };
+	readlink("/proc/self/exe", exec_name, 1024);
 	return std::string(exec_name);
 }
 #endif
 
-static std::string get_fn_from_fullfn(std::string fullfn)
-{
+static std::string get_fn_from_fullfn(std::string fullfn) {
 #ifdef _WIN32
 	int pos = fullfn.rfind("\\");
 #else
@@ -65,8 +57,10 @@ static std::string get_fn_from_fullfn(std::string fullfn)
 	return fn;
 }
 
-static void judgeTimeAndDel(std::string strFullFn)
-{
+/**
+ * @brief Based on time in the log file name, delete log files one month ago.
+ */
+static void judgeTimeAndDel(std::string strFullFn) {
 	std::string fn = get_fn_from_fullfn(strFullFn);
 	int curY = 0;
 	int curM = 0;
@@ -90,18 +84,17 @@ static void judgeTimeAndDel(std::string strFullFn)
 
 	if (curY * 12 * 30 + curM * 30 + curD - oldY * 12 * 30 - oldM * 30 - oldD >= 28) {
 		remove(strFullFn.c_str());
-		std::cout << " had deleted! "<< std::endl;
+		std::cout << " had deleted! " << std::endl;
 	}
 }
 
 /**
-* @brief Delete log.txt before more one month, or all '*.log' files
-* @param bOneMonth: 
-*	true: delete *.log created before one month.
-*	false: delete all *.log 
-*/
-static void delOneMonthAgoLog(bool bOneMonth)
-{
+ * @brief Delete log.txt before more one month, or all '*.log' files
+ * @param bOneMonth:
+ *	true: delete *.log created before one month.
+ *	false: delete all *.log
+ */
+static void delOneMonthAgoLog(bool bOneMonth) {
 	std::string strRootPath = getExePath();
 
 #ifdef _WIN32
@@ -139,77 +132,79 @@ static void delOneMonthAgoLog(bool bOneMonth)
 		_findclose(Handle);
 	}
 #else
-	unsigned int count = 0;		//临时计数，[0，SINGLENUM]  
-	char txtname[128];			//存放文本文件名  
+	unsigned int count = 0;		//
+	char txtname[128];			//
 	DIR *dp;
 	struct dirent *dirp;
 
 	// opendir, readdir, closedir
-	dp = opendir(strRootPath.c_str());  
-	if (dp == NULL)
-	{
+	dp = opendir(strRootPath.c_str());
+	if (dp == NULL) {
 		perror("opendir");
 	}
 
 	// loop all files.  
-	while ((dirp = readdir(dp)) != NULL)
-	{  
-		if (strcmp(dirp->d_name, ".") == 0 || strcmp(dirp->d_name, "..") == 0)
+	while ((dirp = readdir(dp)) != NULL) {
+		std::string strDName = std::string(dirp->d_name);
+		if (strDName == std::string(".") || strDName == std::string(".."))
 			continue;
 
-		int size = strlen(dirp->d_name);
-
+		size_t sz = strDName.length();
 		// file length < 5, can't is *.log file.  
-		if (size<5)
+		if (sz < 5)
 			continue;
 
 		// find all *.log file
-		if (strcmp((dirp->d_name + (size - 4)), ".log") != 0)
+		if (strDName.substr(sz - 4, 4) != std::string(".log"))
 			continue;
 
-		std::cout << dirp->d_name << std::endl;
+		std::cout << strDName << std::endl;
 	}
 
 	closedir(dp);
 #endif
 }
 
-static std::string getLogFileName(std::string strLogFn)
-{
-	time_t t = time(0);
-	char tmp[64];
-	strftime(tmp, sizeof(tmp), "%Y-%m-%d-%H-%M-%S", localtime(&t));
-
-	strLogFn = strLogFn.empty() ? LOG_NAME : strLogFn;
-
-	strLogFn = strLogFn + "_" + std::string(tmp) + ".log";
-
-	return strLogFn;
-}
-
-std::string getCurStrTime()
-{
+/**
+ * @brief Convert time into particular format.
+ */
+static std::string getCurStrTime() {
 	time_t t = time(0);
 	char tmp[64];
 	strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&t));
-
 	return std::string(tmp);
 }
 
-void printfLog(const char* pLogText)
-{
-	g_threadLock.lock();
+/**
+ * @brief Log file name added time.
+ */
+static std::string getLogFileName(std::string strLogFn) {
+	std::string strTime = getCurStrTime();
+	strLogFn = strLogFn.empty() ? LOG_NAME : strLogFn;
+	strLogFn = strLogFn + "_" + strTime + ".log";
+	return strLogFn;
+}
 
+/**
+ * @brief Printf log to screen and file.
+ * @param pLogText: log text.
+ */
+void printfLog(const char* pLogText) {
+	g_output_mutex.lock();
 	std::string strLogFullName = getExePath() + "\\" + g_LogFileName;
 
 	static FILE* g_pFOut = NULL;
-	if (g_pFOut == NULL)
-	{
-		g_pFOut = fopen(strLogFullName.c_str(), "a+");	// 如果文件不存在，则创建
-		if (NULL == g_pFOut)
-		{
-			printf("can't write log\n");
-			return;
+	if (g_bWriteFile) {
+		if (g_pFOut == NULL) {
+			/**
+			 * Save log to file.
+			 */
+			g_pFOut = fopen(strLogFullName.c_str(), "a+");
+			if (NULL == g_pFOut) {
+				printf("can't write log\n");
+				g_output_mutex.unlock();
+				return;
+			}
 		}
 	}
 
@@ -217,12 +212,14 @@ void printfLog(const char* pLogText)
 	char tmp[64];
 	strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S", localtime(&t));
 
-	fprintf(g_pFOut, "%s %s", tmp,  pLogText);
-	fflush(g_pFOut);
-	
+	// Write log to file.
+	if (g_bWriteFile) {
+		fprintf(g_pFOut, "%s %s", tmp, pLogText);
+		fflush(g_pFOut);
+	}
 	printf("%s %s\n", tmp, pLogText);
 
-	g_threadLock.unlock();
+	g_output_mutex.unlock();
 }
 
 void InitialLog(const char* pLogFn, bool bLogNameAddTime, bool bDelOldLog, bool bWriteFile)
