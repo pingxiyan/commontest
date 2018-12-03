@@ -1,12 +1,6 @@
-/******************************************************************************
-Ä£¿éÃû      £º GetRoi
-ÎÄ¼şÊµÏÖ¹¦ÄÜ£º Í¨ÓÃÌØÕ÷¿âÎÄ¼ş¶ÁĞ´
-°æ±¾        £º 1.0
--------------------------------------------------------------------------------
-ĞŞ¸Ä¼ÇÂ¼:
-ÈÕ  ÆÚ        °æ±¾        ĞŞ¸ÄÈË        ×ß¶ÁÈË    ĞŞ¸ÄÄÚÈİ
-2015-11-24    1.0         ãÆÎ÷Æ½                    ´´½¨
-******************************************************************************/
+/**
+ * @brief binary file IO, basic function.
+ */
 
 #include "common_test.h"
 
@@ -19,7 +13,7 @@ using std::string;
 #include <stdlib.h>
 
 
-// Êı×é¶ÁĞ´
+// æ•°ç»„è¯»å†™
 void writeArray(FILE* pfOut, char* pf32Arr, int len)
 {
 	// fprintf(pfOut, "%d,", len);
@@ -27,7 +21,7 @@ void writeArray(FILE* pfOut, char* pf32Arr, int len)
 	fwrite(pf32Arr, sizeof(char), len, pfOut);
 }
 
-// ±äÁ¿¶ÁĞ´
+// å˜é‡è¯»å†™
 void writeString(FILE* pfOut, std::string str)
 {
 	writeText(pfOut, (int)(str.length()));
@@ -118,13 +112,13 @@ void readVector2Buf(FILE* pfIn, float * pArr)
 	//	readText(pfIn, pArr[i]);
 	//}
 }
-// true£ºÎÄ¼ş½áÎ²£¬
+// trueï¼šæ–‡ä»¶ç»“å°¾ï¼Œ
 CTAPI bool fileEof(FILE* pfIn)
 {
 	return feof(pfIn) == EOF;
 }
 
-// ÎÄ¼şÍ·£¬¼ÇÂ¼ÎÄ¼şÖĞÓĞ¶àÉÙ¸öÌõÌØÕ÷
+// æ–‡ä»¶å¤´ï¼Œè®°å½•æ–‡ä»¶ä¸­æœ‰å¤šå°‘ä¸ªæ¡ç‰¹å¾
 void writeHeader(FILE* pfOut, int num)
 {
 	fseek (pfOut, 0, SEEK_SET);
@@ -140,13 +134,13 @@ void writeHeader3P(FILE* pfOut, int num, int dim)
 	fseek(pfOut, 0, SEEK_END);
 }
 
-// ¶ÁÎÄ¼şÍ·
+// è¯»æ–‡ä»¶å¤´
 void readHeader(FILE* pfOut, int& num)
 {
 	int curpos = ftell(pfOut);
 	if (curpos == 0)
 	{
-		// µ±Ç°Î»ÖÃÔÚÎÄ¼ş¿ªÍ·
+		// å½“å‰ä½ç½®åœ¨æ–‡ä»¶å¼€å¤´
 		readText(pfOut, num);
 	}
 	else
@@ -162,7 +156,7 @@ void readHeader3P(FILE* pfOut, int& num, int &dim)
 	int curpos = ftell(pfOut);
 	if (curpos == 0)
 	{
-		// µ±Ç°Î»ÖÃÔÚÎÄ¼ş¿ªÍ·
+		// å½“å‰ä½ç½®åœ¨æ–‡ä»¶å¼€å¤´
 		readText(pfOut, num);
 		readText(pfOut, dim);
 	}
@@ -175,14 +169,14 @@ void readHeader3P(FILE* pfOut, int& num, int &dim)
 	}
 }
 
-// ¶àÏß³Ì²âÊÔÊ±£¬vector·Ö¶Î(Æ½¾ù)
-std::vector<std::string> vecStrSection(int totalSection, int curId/*´Ó0¿ªÊ¼*/,
+// å¤šçº¿ç¨‹æµ‹è¯•æ—¶ï¼Œvectoråˆ†æ®µ(å¹³å‡)
+std::vector<std::string> vecStrSection(int totalSection, int curId/*ä»0å¼€å§‹*/,
 									   std::vector<std::string> vecAll)
 {
 	std::vector<std::string> vecRes;
 	int onePartLen = (int)vecAll.size() / totalSection;
 
-	// ×îºóÒ»¶Î
+	// æœ€åä¸€æ®µ
 	if (curId == totalSection - 1)
 	{
 		vecRes.assign(vecAll.begin() + curId*onePartLen, vecAll.end()); 
@@ -195,14 +189,14 @@ std::vector<std::string> vecStrSection(int totalSection, int curId/*´Ó0¿ªÊ¼*/,
 	return vecRes;
 }
 
-// ¶àÏß³Ì²âÊÔÊ±£¬vector·Ö¶Î(Æ½¾ù)
-CTAPI std::vector<TImgSet> vecStrSection(int totalSection, int curId/*´Ó0¿ªÊ¼*/,
+// å¤šçº¿ç¨‹æµ‹è¯•æ—¶ï¼Œvectoråˆ†æ®µ(å¹³å‡)
+CTAPI std::vector<TImgSet> vecStrSection(int totalSection, int curId/*ä»0å¼€å§‹*/,
 										 std::vector<TImgSet> vecAll)
 {
 	std::vector<TImgSet> vecRes;
 	int onePartLen = (int)vecAll.size() / totalSection;
 
-	// ×îºóÒ»¶Î
+	// æœ€åä¸€æ®µ
 	if (curId == totalSection - 1)
 	{
 		vecRes.assign(vecAll.begin() + curId*onePartLen, vecAll.end()); 
