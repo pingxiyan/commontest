@@ -200,14 +200,26 @@ int unit_test_color_space_convert()
 	return 0;
 }
 
-#include "get_cpu_gpu_util.hpp"
+#include "get_hw_infor.hpp"
 void test_get_cpu_gup_util() {
-	std::vector<std::tuple<int, float>> gpuInfor;
-	//get_nvidia_gpu_uitl(gpuInfor);
-	
-	float util = 0;
-	float mem_size = 0;
-	get_cpu_uitl(util, mem_size);
+	std::cout << "============================" << std::endl;
+	TCPUInfo cpuInfor;
+	get_cpu_infor(cpuInfor);
+	std::cout << "cpuInfor.freq = " << cpuInfor.freq << " GHz" << std::endl;
+	std::cout << "cpuInfor.memUsed = " << cpuInfor.memUsed/1024.0/1024.0 << " G" << std::endl;
+	std::cout << "cpuInfor.memTotal = " << cpuInfor.memTotal/1024.0/1024.0 << " G" << std::endl;
+	std::cout << "cpuInfor.thrdNum = " << cpuInfor.thrdNum << std::endl;
+	std::cout << "cpuInfor.util = " << cpuInfor.util << " %" << std::endl;
+
+	std::cout << "============================" << std::endl;
+	std::vector<TNVGPUInfo> gpuInfor;
+	get_nv_gpu_infor(gpuInfor);
+	for(auto g : gpuInfor) {
+		std::cout << "-----------------------" << std::endl;
+		std::cout << "util = " << g.util << " %" << std::endl;
+		std::cout << "memTotal = " << g.memTotal << " MBi" << std::endl;
+		std::cout << "memUsed = " << g.memUsed << " MBi" << std::endl;
+	}
 }
 
 int main(int argc, char** argv)
