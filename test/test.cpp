@@ -200,8 +200,19 @@ int unit_test_color_space_convert()
 	return 0;
 }
 
+#include "get_cpu_gpu_util.hpp"
+void test_get_cpu_gup_util() {
+	std::vector<std::tuple<int, float>> gpuInfor;
+	//get_nvidia_gpu_uitl(gpuInfor);
+	
+	float util = 0;
+	float mem_size = 0;
+	get_cpu_uitl(util, mem_size);
+}
+
 int main(int argc, char** argv)
 {
+	test_get_cpu_gup_util();return 0;
 	//return unit_test_args_parser_gflags(argc, argv);
 	return unit_test_args_parser_myself(argc, argv);
 
